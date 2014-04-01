@@ -1,0 +1,13 @@
+language: scala
+
+jdk:
+  - oraclejdk7
+  - oraclejdk8
+
+script: sbt checkGenerate test $(if [[ "${TRAVIS_PULL_REQUEST}" == "false" && ${JAVA_HOME} == $(jdk_switcher home oraclejdk7) && "${TRAVIS_BRANCH}" == "master" ]]; then echo "publish"; fi)
+
+env:
+  global:
+    - secure: "Ve7cnFw3RMBSDkMrYaMnEOfpBQXbsFAI5k+omfIgFb6M8QL4yABdQYh3YzjqWiKEtOyZI3Wkvo9MU6gkfNT7DS5mG0QL4qE6p4pvRRFXpf0h4m/1oyAf9kIxIkWE+rP2VONOnVlJEuoew8zHc2MfLzCC9D43kThZjV9Bpj6/L2E="
+    - secure: "cmix/cli7nqQBTHqFuPGojm1w4Q7rrrZpFAtl8u2PmMEeid6zmbcpHXzr98X9kmHaVBuNCL11euOVWxyZRw/lDgkAl9XXqUCapgjDVJD+Eeid7INEdAZkYddZbTx5K3p2xwZVoWMhj68sFFbD3QrfbJVLgIHcLpgYTLB1viSc78="
+
