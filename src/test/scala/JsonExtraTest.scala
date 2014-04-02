@@ -22,9 +22,25 @@ object JsonExtraTest extends Properties("JsonExtra") {
     )
   }
 
+  final case class Arity1(aaa: List[Int])
+
+  object Arity1 {
+    implicit val arity1Format: Format[Arity1] =
+      CaseClassFormats(apply _, unapply _)("xyz")
+
+    implicit val fooArbitrary: Arbitrary[Arity1] = Arbitrary(
+      implicitly[Arbitrary[List[Int]]].arbitrary.map(Arity1.apply)
+    )
+  }
+
   property("write read") = Prop.forAll{ foo: Foo =>
     val json = implicitly[Writes[Foo]].writes(foo)
     json.as[Foo] == foo
+  }
+
+  property("arity 1") = Prop.forAll{ a: Arity1 =>
+    val json = implicitly[Writes[Arity1]].writes(a)
+    json.as[Arity1] == a
   }
 
 }
