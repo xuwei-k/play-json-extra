@@ -21,6 +21,6 @@ resolvers += Opts.resolver.sonatypeSnapshots
 libraryDependencies += "com.github.xuwei-k" %% "play-json-extra" % "0.1.1-SNAPSHOT"
 ```
 
-- [API Documentation](https://oss.sonatype.org/service/local/repositories/snapshots/archive/com/github/xuwei-k/play-json-extra_2.10/0.1.0-SNAPSHOT/play-json-extra_2.10-0.1.0-SNAPSHOT-javadoc.jar/!/index.html)
+- [API Documentation](https://oss.sonatype.org/service/local/repositories/snapshots/archive/com/github/xuwei-k/play-json-extra_2.10/0.1.1-SNAPSHOT/play-json-extra_2.10-0.1.1-SNAPSHOT-javadoc.jar/!/index.html)
 
 
