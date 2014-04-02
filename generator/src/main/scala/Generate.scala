@@ -39,18 +39,18 @@ object Generate {
   private val writes: String => String = { className =>
     val method: Int => String = { n =>
 s"""
-  def apply[${tparams(n).mkString(", ")}, Z](f: Z => Option[(${tparams(n).mkString(", ")})])(${params(n).map(_ + ": String").mkString(", ")})(implicit ${tparams(n).map(t => s"${t}: Writes[${t}]").mkString(", ")}): Writes[Z] =
+  def apply[${tparams(n).mkString(", ")}, Z](f: Z => Option[(${tparams(n).mkString(", ")})])(${params(n).map(_ + ": String").mkString(", ")})(implicit ${tparams(n).map(t => s"${t}: Writes[${t}]").mkString(", ")}): OWrites[Z] =
     (${(tparams(n), params(n)).zipped.map((t, k) => s"Writes.at(JsPath \\ ${k})(${t})").mkString(" and ")})(Function.unlift(f))
 """
     }
 
     packageLine + s"""
-import play.api.libs.json.{Writes, JsPath}
+import play.api.libs.json.{Writes, OWrites, JsPath}
 import play.api.libs.functional.syntax._
 
 object $className {
 
-  def apply[A1, Z](f: Z => Option[A1])(key1: String)(implicit A1: Writes[A1]): Writes[Z] =
+  def apply[A1, Z](f: Z => Option[A1])(key1: String)(implicit A1: Writes[A1]): OWrites[Z] =
     Writes.at(JsPath \\ key1)(A1).contramap(Function.unlift(f))
 
   ${arities.map(method).mkString("\n")}
@@ -83,8 +83,8 @@ object $className {
   private val formats: String => String = { className =>
     val method: Int => String = { n =>
 s"""
-  def apply[${tparams(n).mkString(", ")}, Z](applyFunc: (${tparams(n).mkString(", ")}) => Z, unapplyFunc: Z => Option[(${tparams(n).mkString(", ")})])(${params(n).map(_ + ": String").mkString(", ")})(implicit ${tparams(n).map(t => s"${t}R: Reads[${t}]").mkString(", ")}, ${tparams(n).map(t => s"${t}W: Writes[${t}]").mkString(", ")}): Format[Z] =
-    Format.GenericFormat(
+  def apply[${tparams(n).mkString(", ")}, Z](applyFunc: (${tparams(n).mkString(", ")}) => Z, unapplyFunc: Z => Option[(${tparams(n).mkString(", ")})])(${params(n).map(_ + ": String").mkString(", ")})(implicit ${tparams(n).map(t => s"${t}R: Reads[${t}]").mkString(", ")}, ${tparams(n).map(t => s"${t}W: Writes[${t}]").mkString(", ")}): OFormat[Z] =
+    OFormat(
       CaseClassReads(applyFunc)(${params(n).mkString(", ")}),
       CaseClassWrites(unapplyFunc)(${params(n).mkString(", ")})
     )
@@ -92,13 +92,13 @@ s"""
     }
 
     packageLine + s"""
-import play.api.libs.json.{Reads, Writes, Format, JsPath}
+import play.api.libs.json.{Reads, Writes, Format, OFormat, JsPath}
 import play.api.libs.functional.syntax._
 
 object $className {
 
-  def apply[A1, Z](applyFunc: A1 => Z, unapplyFunc: Z => Option[A1])(key1: String)(implicit A1R: Reads[A1], A1W: Writes[A1]): Format[Z] =
-    Format.GenericFormat(
+  def apply[A1, Z](applyFunc: A1 => Z, unapplyFunc: Z => Option[A1])(key1: String)(implicit A1R: Reads[A1], A1W: Writes[A1]): OFormat[Z] =
+    OFormat(
       CaseClassReads(applyFunc)(key1),
       CaseClassWrites(unapplyFunc)(key1)
     )
