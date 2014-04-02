@@ -49,6 +49,10 @@ import play.api.libs.json.{Writes, JsPath}
 import play.api.libs.functional.syntax._
 
 object $className {
+
+  def apply[A1, Z](f: Z => Option[A1])(key1: String)(implicit A1: Writes[A1]): Writes[Z] =
+    Writes.at(JsPath \\ key1)(A1).contramap(Function.unlift(f))
+
   ${arities.map(method).mkString("\n")}
 }
 """
@@ -67,6 +71,10 @@ import play.api.libs.json.{Reads, JsPath}
 import play.api.libs.functional.syntax._
 
 object $className {
+
+  def apply[A1, Z](f: A1 => Z)(key1: String)(implicit A1: Reads[A1]): Reads[Z] =
+    Reads.at(JsPath \\ key1)(A1).map(f)
+
   ${arities.map(method).mkString("\n")}
 }
 """
@@ -88,6 +96,13 @@ import play.api.libs.json.{Reads, Writes, Format, JsPath}
 import play.api.libs.functional.syntax._
 
 object $className {
+
+  def apply[A1, Z](applyFunc: A1 => Z, unapplyFunc: Z => Option[A1])(key1: String)(implicit A1R: Reads[A1], A1W: Writes[A1]): Format[Z] =
+    Format.GenericFormat(
+      CaseClassReads(applyFunc)(key1),
+      CaseClassWrites(unapplyFunc)(key1)
+    )
+
   ${arities.map(method).mkString("\n")}
 }
 """

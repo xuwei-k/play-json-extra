@@ -4,6 +4,13 @@ import play.api.libs.json.{Reads, Writes, Format, JsPath}
 import play.api.libs.functional.syntax._
 
 object CaseClassFormats {
+
+  def apply[A1, Z](applyFunc: A1 => Z, unapplyFunc: Z => Option[A1])(key1: String)(implicit A1R: Reads[A1], A1W: Writes[A1]): Format[Z] =
+    Format.GenericFormat(
+      CaseClassReads(applyFunc)(key1),
+      CaseClassWrites(unapplyFunc)(key1)
+    )
+
   
   def apply[A1, A2, Z](applyFunc: (A1, A2) => Z, unapplyFunc: Z => Option[(A1, A2)])(key1: String, key2: String)(implicit A1R: Reads[A1], A2R: Reads[A2], A1W: Writes[A1], A2W: Writes[A2]): Format[Z] =
     Format.GenericFormat(

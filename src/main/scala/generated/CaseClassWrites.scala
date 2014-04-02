@@ -4,6 +4,10 @@ import play.api.libs.json.{Writes, JsPath}
 import play.api.libs.functional.syntax._
 
 object CaseClassWrites {
+
+  def apply[A1, Z](f: Z => Option[A1])(key1: String)(implicit A1: Writes[A1]): Writes[Z] =
+    Writes.at(JsPath \ key1)(A1).contramap(Function.unlift(f))
+
   
   def apply[A1, A2, Z](f: Z => Option[(A1, A2)])(key1: String, key2: String)(implicit A1: Writes[A1], A2: Writes[A2]): Writes[Z] =
     (Writes.at(JsPath \ key1)(A1) and Writes.at(JsPath \ key2)(A2))(Function.unlift(f))

@@ -4,6 +4,10 @@ import play.api.libs.json.{Reads, JsPath}
 import play.api.libs.functional.syntax._
 
 object CaseClassReads {
+
+  def apply[A1, Z](f: A1 => Z)(key1: String)(implicit A1: Reads[A1]): Reads[Z] =
+    Reads.at(JsPath \ key1)(A1).map(f)
+
   
   def apply[A1, A2, Z](f: (A1, A2) => Z)(key1: String, key2: String)(implicit A1: Reads[A1], A2: Reads[A2]): Reads[Z] =
     (Reads.at(JsPath \ key1)(A1) and Reads.at(JsPath \ key2)(A2))(f)
