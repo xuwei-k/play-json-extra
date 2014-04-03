@@ -40,7 +40,12 @@ object Generate {
     val method: Int => String = { n =>
 s"""
   def apply[${tparams(n).mkString(", ")}, Z](f: Z => Option[(${tparams(n).mkString(", ")})])(${params(n).map(_ + ": String").mkString(", ")})(implicit ${tparams(n).map(t => s"${t}: Writes[${t}]").mkString(", ")}): OWrites[Z] =
-    (${(tparams(n), params(n)).zipped.map((t, k) => s"Writes.at(JsPath \\ ${k})(${t})").mkString(" and ")})(Function.unlift(f))
+    OWrites{ z: Z =>
+      val tuple = f(z).get
+      ${tparams(n).zip(params(n)).zipWithIndex.map{ case ((t, k), i) =>
+        s"(JsPath.createObj((JsPath \\ $k) -> $t.writes(tuple._${i + 1})))"
+      }.mkString(".deepMerge")}
+    }
 """
     }
 
