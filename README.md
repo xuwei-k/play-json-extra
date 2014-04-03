@@ -11,7 +11,7 @@
 libraryDependencies += "com.github.xuwei-k" %% "play-json-extra" % "0.1.1"
 ```
 
-- [API Documentation](https://oss.sonatype.org/service/local/repositories/releases/archive/com/github/xuwei-k/play-json-extra_2.10/0.1.0/play-json-extra_2.10-0.1.0-javadoc.jar/!/index.html)
+- [API Documentation](https://oss.sonatype.org/service/local/repositories/releases/archive/com/github/xuwei-k/play-json-extra_2.10/0.1.1/play-json-extra_2.10-0.1.1-javadoc.jar/!/index.html)
 
 ### snapshot version
 
@@ -21,6 +21,6 @@ resolvers += Opts.resolver.sonatypeSnapshots
 libraryDependencies += "com.github.xuwei-k" %% "play-json-extra" % "0.1.2-SNAPSHOT"
 ```
 
-- [API Documentation](https://oss.sonatype.org/service/local/repositories/snapshots/archive/com/github/xuwei-k/play-json-extra_2.10/0.1.1-SNAPSHOT/play-json-extra_2.10-0.1.1-SNAPSHOT-javadoc.jar/!/index.html)
+- [API Documentation](https://oss.sonatype.org/service/local/repositories/snapshots/archive/com/github/xuwei-k/play-json-extra_2.10/0.1.2-SNAPSHOT/play-json-extra_2.10-0.1.2-SNAPSHOT-javadoc.jar/!/index.html)
 
 
