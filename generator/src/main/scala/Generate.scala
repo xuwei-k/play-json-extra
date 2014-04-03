@@ -67,15 +67,24 @@ object $className {
     val method: Int => String = { n =>
 s"""
   def apply[${tparams(n).mkString(", ")}, Z](f: (${tparams(n).mkString(", ")}) => Z)(${params(n).map(_ + ": String").mkString(", ")})(implicit ${tparams(n).map(t => s"${t}: Reads[${t}]").mkString(", ")}): Reads[Z] =
-    (${(tparams(n), params(n)).zipped.map((t, k) => s"Reads.at(JsPath \\ ${k})(${t})").mkString(" and ")})(f)
+    Reads[Z](json =>
+      (${(tparams(n), params(n)).zipped.map((t, k) => s"(json \\ $k).validate($t)").mkString(" and ")})(f)
+    )
 """
     }
 
     packageLine + s"""
-import play.api.libs.json.{Reads, JsPath}
+import play.api.libs.json.{Reads, JsPath, JsValue, JsResult}
 import play.api.libs.functional.syntax._
+import play.api.libs.functional.Functor
 
 object $className {
+
+  private[this] implicit val jsResultFunctor: Functor[JsResult] =
+    new Functor[JsResult] {
+      def fmap[A, B](m: JsResult[A], f: A => B) = m map f
+    }
+
 
   def apply[A1, Z](f: A1 => Z)(key1: String)(implicit A1: Reads[A1]): Reads[Z] =
     Reads.at(JsPath \\ key1)(A1).map(f)
