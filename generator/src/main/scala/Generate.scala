@@ -65,25 +65,25 @@ object $className {
 
   private val reads: String => String = { className =>
     val method: Int => String = { n =>
+      val values = (1 to n).map("a" + _)
+      val zipped = (tparams(n), params(n)).zipped.map((t, k) => s"$t.reads(json \\ $k)").toList
 s"""
   def apply[${tparams(n).mkString(", ")}, Z](f: (${tparams(n).mkString(", ")}) => Z)(${params(n).map(_ + ": String").mkString(", ")})(implicit ${tparams(n).map(t => s"${t}: Reads[${t}]").mkString(", ")}): Reads[Z] =
     Reads[Z](json =>
-      (${(tparams(n), params(n)).zipped.map((t, k) => s"(json \\ $k).validate($t)").mkString(" and ")})(f)
+      ${zipped.tail.foldLeft(zipped.head){(result, a) => "G(" + result + ", " + a + ")"}}.map{ case ${values.mkString(" ~ ")} => f(${values.mkString(", ")})}
     )
 """
     }
 
     packageLine + s"""
 import play.api.libs.json.{Reads, JsPath, JsValue, JsResult}
-import play.api.libs.functional.syntax._
-import play.api.libs.functional.Functor
+import play.api.libs.functional.syntax.functionalCanBuildApplicative
+import play.api.libs.functional.{FunctionalCanBuild, ~}
 
 object $className {
 
-  private[this] implicit val jsResultFunctor: Functor[JsResult] =
-    new Functor[JsResult] {
-      def fmap[A, B](m: JsResult[A], f: A => B) = m map f
-    }
+  private[this] val G: FunctionalCanBuild[JsResult] =
+    functionalCanBuildApplicative[JsResult]
 
 
   def apply[A1, Z](f: A1 => Z)(key1: String)(implicit A1: Reads[A1]): Reads[Z] =
