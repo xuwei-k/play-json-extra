@@ -8,7 +8,7 @@
 ### latest stable version
 
 ```scala
-libraryDependencies += "com.github.xuwei-k" %% "play-json-extra" % "0.1.0"
+libraryDependencies += "com.github.xuwei-k" %% "play-json-extra" % "0.1.1"
 ```
 
 - [API Documentation](https://oss.sonatype.org/service/local/repositories/releases/archive/com/github/xuwei-k/play-json-extra_2.10/0.1.0/play-json-extra_2.10-0.1.0-javadoc.jar/!/index.html)
