@@ -30,12 +30,13 @@ object Generate extends Build {
     val snapshotOrRelease = if(extracted get isSnapshot) "snapshots" else "releases"
     val readme = "README.md"
     val readmeFile = file(readme)
+    val SonatypeURL = "https://oss.sonatype.org/service/local/repositories"
     val newReadme = Predef.augmentString(IO.read(readmeFile)).lines.map{ line =>
       val matchReleaseOrSnapshot = line.contains("SNAPSHOT") == v.contains("SNAPSHOT")
       if(line.startsWith("libraryDependencies") && matchReleaseOrSnapshot){
         s"""libraryDependencies += "${org}" %% "${moduleName}" % "$v""""
-      }else if(line.contains(Resolver.SonatypeRepositoryRoot) && matchReleaseOrSnapshot){
-        s"- [API Documentation](${Resolver.SonatypeRepositoryRoot}/${snapshotOrRelease}/archive/${org.replace('.','/')}/${moduleName}_${scalaV}/${v}/${moduleName}_${scalaV}-${v}-javadoc.jar/!/index.html)"
+      }else if(line.contains(SonatypeURL) && matchReleaseOrSnapshot){
+        s"- [API Documentation](${SonatypeURL}/${snapshotOrRelease}/archive/${org.replace('.','/')}/${moduleName}_${scalaV}/${v}/${moduleName}_${scalaV}-${v}-javadoc.jar/!/index.html)"
       }else line
     }.mkString("", "\n", "\n")
     IO.write(readmeFile, newReadme)
