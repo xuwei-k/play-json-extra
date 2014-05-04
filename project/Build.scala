@@ -75,10 +75,6 @@ object Generate extends Build {
     organization := "com.github.xuwei-k",
     licenses := Seq("MIT License" -> url("http://www.opensource.org/licenses/mit-license.php")),
     homepage := Some(url("https://github.com/xuwei-k/play-json-extra")),
-    scmInfo := Some(ScmInfo(
-      url("https://github.com/xuwei-k/play-json-extra"),
-      "scm:git:git@github.com/xuwei-k/play-json-extra.git"
-    )),
     commands += Command.command("updateReadme")(updateReadme),
     ReleasePlugin.ReleaseKeys.releaseProcess := Seq[ReleaseStep](
       checkSnapshotDependencies,
@@ -138,6 +134,11 @@ object Generate extends Build {
           <url>https://github.com/xuwei-k</url>
         </developer>
       </developers>
+      <scm>
+        <url>git@github.com:xuwei-k/play-json-extra.git</url>
+        <connection>scm:git:git@github.com:xuwei-k/play-json-extra.git</connection>
+        <tag>{if(isSnapshot.value) gitHash else { "v" + version.value }}</tag>
+      </scm>
     )
   )
 }
