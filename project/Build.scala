@@ -18,6 +18,7 @@ object Generate extends Build {
 
   val commonSettins = Seq(
     scalaVersion := "2.10.4",
+    crossScalaVersions := scalaVersion.value :: Nil,
     scalacOptions := Seq("-deprecation", "-unchecked", "-Xlint", "-language:_")
   )
 
