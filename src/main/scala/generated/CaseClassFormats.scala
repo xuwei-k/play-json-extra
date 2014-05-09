@@ -1,7 +1,6 @@
 package play.jsonext
 
 import play.api.libs.json.{Reads, Writes, OFormat}
-import play.api.libs.functional.syntax._
 
 object CaseClassFormats {
 
