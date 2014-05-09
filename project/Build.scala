@@ -18,8 +18,14 @@ object Generate extends Build {
 
   val commonSettins = Seq(
     scalaVersion := "2.10.4",
-    crossScalaVersions := scalaVersion.value :: Nil,
-    scalacOptions := Seq("-deprecation", "-unchecked", "-Xlint", "-language:_")
+    crossScalaVersions := scalaVersion.value :: "2.11.0" :: Nil,
+    scalacOptions ++= Seq("-deprecation", "-unchecked", "-Xlint", "-language:_"),
+    scalacOptions ++= (
+      if(scalaVersion.value startsWith "2.11")
+        Seq("-Ywarn-unused", "-Ywarn-unused-import")
+      else
+        Nil
+    )
   )
 
   val updateReadme = { state: State =>
@@ -119,7 +125,7 @@ object Generate extends Build {
     },
     aggregate := false,
     resolvers += "typesafe" at "http://typesafe.artifactoryonline.com/typesafe/releases/",
-    libraryDependencies += "com.typesafe.play" %% "play-json" % "2.2.2" % "provided",
+    libraryDependencies += "com.typesafe.play" %% "play-json" % "2.3.0-RC1" % "provided",
     libraryDependencies += "org.scalacheck" %% "scalacheck" % "1.11.3" % "test",
     packageSrc in Compile <<= (packageSrc in Compile).dependsOn(compile in Compile),
     watchSources ++= ((sourceDirectory in generator).value ** "*.scala").get,
