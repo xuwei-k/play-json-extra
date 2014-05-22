@@ -125,7 +125,7 @@ object Generate extends Build {
     },
     aggregate := false,
     resolvers += "typesafe" at "http://typesafe.artifactoryonline.com/typesafe/releases/",
-    libraryDependencies += "com.typesafe.play" %% "play-json" % "2.3.0-RC1" % "provided",
+    libraryDependencies += "com.typesafe.play" %% "play-json" % "2.3.0-RC2" % "provided",
     libraryDependencies += "org.scalacheck" %% "scalacheck" % "1.11.3" % "test",
     packageSrc in Compile <<= (packageSrc in Compile).dependsOn(compile in Compile),
     watchSources ++= ((sourceDirectory in generator).value ** "*.scala").get,
