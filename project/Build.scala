@@ -19,7 +19,15 @@ object Generate extends Build {
   val commonSettins = Seq(
     scalaVersion := "2.10.4",
     crossScalaVersions := scalaVersion.value :: "2.11.2" :: Nil,
-    scalacOptions ++= Seq("-deprecation", "-unchecked", "-Xlint", "-language:_"),
+    scalacOptions ++= (
+      "-deprecation" ::
+      "-unchecked" ::
+      "-Xlint" ::
+      "-language:existentials" ::
+      "-language:higherKinds" ::
+      "-language:implicitConversions" ::
+      Nil
+    ),
     scalacOptions ++= (
       if(scalaVersion.value startsWith "2.11")
         Seq("-Ywarn-unused", "-Ywarn-unused-import")
