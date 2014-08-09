@@ -91,6 +91,16 @@ object Generate extends Build {
     licenses := Seq("MIT License" -> url("http://www.opensource.org/licenses/mit-license.php")),
     homepage := Some(url("https://github.com/xuwei-k/play-json-extra")),
     commands += Command.command("updateReadme")(updateReadme),
+    pomPostProcess := { node =>
+      import scala.xml._
+      import scala.xml.transform._
+      def stripIf(f: Node => Boolean) = new RewriteRule {
+        override def transform(n: Node) =
+          if (f(n)) NodeSeq.Empty else n
+      }
+      val stripTestScope = stripIf { n => n.label == "dependency" && (n \ "scope").text == "test" }
+      new RuleTransformer(stripTestScope).transform(node)(0)
+    },
     ReleasePlugin.ReleaseKeys.releaseProcess := Seq[ReleaseStep](
       checkSnapshotDependencies,
       inquireVersions,
