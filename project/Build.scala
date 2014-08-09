@@ -3,9 +3,11 @@ import sbtrelease._
 import xerial.sbt.Sonatype._
 import ReleaseStateTransformations._
 import com.typesafe.sbt.pgp.PgpKeys
+import sbtbuildinfo.Plugin._
 
 object Generate extends Build {
 
+  final val PlayVersion = "2.3.0"
   private val generateSources = taskKey[Unit]("generate main source files")
   private val generatedSourceDir = "generated"
   private val cleanSrc = taskKey[Unit]("clean generated sources")
@@ -84,13 +86,26 @@ object Generate extends Build {
   lazy val playJsonExtra = Project(
     rootProjectId, file(".")
   ).settings(
-    commonSettins ++ ReleasePlugin.releaseSettings ++ sonatypeSettings : _*
+    commonSettins ++ ReleasePlugin.releaseSettings ++ sonatypeSettings ++ buildInfoSettings : _*
   ).settings(
     name := "play-json-extra",
     organization := "com.github.xuwei-k",
     licenses := Seq("MIT License" -> url("http://www.opensource.org/licenses/mit-license.php")),
     homepage := Some(url("https://github.com/xuwei-k/play-json-extra")),
     commands += Command.command("updateReadme")(updateReadme),
+    buildInfoKeys := Seq[BuildInfoKey](
+      organization,
+      name,
+      version,
+      scalaVersion,
+      sbtVersion,
+      scalacOptions,
+      licenses,
+      "playVersion" -> PlayVersion
+    ),
+    sourceGenerators in Compile <+= buildInfo,
+    buildInfoPackage := "play.jsonext",
+    buildInfoObject := "PlayJsonExtraBuildInfo",
     pomPostProcess := { node =>
       import scala.xml._
       import scala.xml.transform._
@@ -143,7 +158,7 @@ object Generate extends Build {
     },
     aggregate := false,
     resolvers += "typesafe" at "http://typesafe.artifactoryonline.com/typesafe/releases/",
-    libraryDependencies += "com.typesafe.play" %% "play-json" % "2.3.0" % "provided",
+    libraryDependencies += "com.typesafe.play" %% "play-json" % PlayVersion % "provided",
     libraryDependencies += "org.scalacheck" %% "scalacheck" % "1.11.3" % "test",
     packageSrc in Compile <<= (packageSrc in Compile).dependsOn(compile in Compile),
     watchSources ++= ((sourceDirectory in generator).value ** "*.scala").get,
