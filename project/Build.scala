@@ -7,7 +7,7 @@ import sbtbuildinfo.Plugin._
 
 object Generate extends Build {
 
-  final val PlayVersion = "2.3.0"
+  final val PlayVersion = "2.4.0-M1"
   private val generateSources = taskKey[Unit]("generate main source files")
   private val generatedSourceDir = "generated"
   private val cleanSrc = taskKey[Unit]("clean generated sources")
@@ -157,7 +157,6 @@ object Generate extends Build {
       ).map("import " + _ + ";").mkString
     },
     aggregate := false,
-    resolvers += "typesafe" at "http://typesafe.artifactoryonline.com/typesafe/releases/",
     libraryDependencies += "com.typesafe.play" %% "play-json" % PlayVersion % "provided",
     libraryDependencies += "org.scalacheck" %% "scalacheck" % "1.11.3" % "test",
     packageSrc in Compile <<= (packageSrc in Compile).dependsOn(compile in Compile),
