@@ -5,7 +5,7 @@
 - [Maven Central](http://repo1.maven.org/maven2/com/github/xuwei-k/play-json-extra_2.10/)
 
 
-### latest stable version
+### latest stable version for play2.2
 
 ```scala
 libraryDependencies += "com.github.xuwei-k" %% "play-json-extra" % "0.1.1"
@@ -13,7 +13,7 @@ libraryDependencies += "com.github.xuwei-k" %% "play-json-extra" % "0.1.1"
 
 - [API Documentation](https://oss.sonatype.org/service/local/repositories/releases/archive/com/github/xuwei-k/play-json-extra_2.10/0.1.1/play-json-extra_2.10-0.1.1-javadoc.jar/!/index.html)
 
-### snapshot version
+### snapshot version for play2.2
 
 ```scala
 resolvers += Opts.resolver.sonatypeSnapshots
