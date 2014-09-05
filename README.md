@@ -1,4 +1,7 @@
-# play-json-extra [![Build Status](https://secure.travis-ci.org/xuwei-k/play-json-extra.png)](http://travis-ci.org/xuwei-k/play-json-extra)
+# play-json-extra
+
+[![Build Status](https://secure.travis-ci.org/xuwei-k/play-json-extra.png)](http://travis-ci.org/xuwei-k/play-json-extra)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.xuwei-k/play-json-extra_2.11/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.xuwei-k/play-json-extra_2.11)
 
 
 - [Maven Central Repository Search](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22com.github.xuwei-k%22%20AND%20a%3A%22play-json-extra_2.10%22)
