@@ -43,4 +43,9 @@ object JsonExtraTest extends Properties("JsonExtra") {
     json.as[Arity1] == a
   }
 
+  property("22") = Prop.forAll{ a: TwentyTwo =>
+    val json = implicitly[OWrites[TwentyTwo]].writes(a)
+    json.as[TwentyTwo] == a
+  }
+
 }
