@@ -32,7 +32,7 @@ object Generate {
   }
 
   private val packageLine = "package play.jsonext\n"
-  private val arities = (2 to 21)
+  private val arities = (2 to 22)
   private def tparams(n: Int) = (1 to n).map("A" + _)
   private def params(n: Int) = (1 to n).map("key" + _)
 
