@@ -158,7 +158,7 @@ object Generate extends Build {
     },
     aggregate := false,
     libraryDependencies += "com.typesafe.play" %% "play-json" % PlayVersion % "provided",
-    libraryDependencies += "org.scalacheck" %% "scalacheck" % "1.11.3" % "test",
+    libraryDependencies += "org.scalacheck" %% "scalacheck" % "1.11.6" % "test",
     packageSrc in Compile <<= (packageSrc in Compile).dependsOn(compile in Compile),
     watchSources ++= ((sourceDirectory in generator).value ** "*.scala").get,
     cleanSrc := IO.delete((scalaSource in Compile).value / generatedSourceDir),
