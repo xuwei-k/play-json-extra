@@ -38,25 +38,39 @@ object Generate {
 
   private val writes: String => String = { className =>
     val method: Int => String = { n =>
+
+      val apply = "apply"
+      val applyN = "apply" + n
+      val f = "f"
+
+      def methodDef(name: String) = s"""def $name[${tparams(n).mkString(", ")}, Z]($f: Z => Option[(${tparams(n).mkString(", ")})])(${params(n).map(_ + ": String").mkString(", ")})(implicit ${tparams(n).map(t => s"${t}: Writes[${t}]").mkString(", ")}): OWrites[Z] ="""
+
 s"""
-  def apply[${tparams(n).mkString(", ")}, Z](f: Z => Option[(${tparams(n).mkString(", ")})])(${params(n).map(_ + ": String").mkString(", ")})(implicit ${tparams(n).map(t => s"${t}: Writes[${t}]").mkString(", ")}): OWrites[Z] =
+  ${methodDef(applyN)}
     OWrites{ z: Z =>
-      val tuple = f(z).get
-      ${tparams(n).zip(params(n)).zipWithIndex.map{ case ((t, k), i) =>
-        s"(JsPath.createObj((JsPath \\ $k) -> $t.writes(tuple._${i + 1})))"
-      }.mkString(".deepMerge")}
+      val tuple = $f(z).get
+      ${tparams(n).zip(params(n)).zipWithIndex.map{
+        case ((t, k), i) => s"(($k, $t.writes(tuple._${i + 1})))"
+      }.reverse.mkString("JsObject(Nil.::", ".::", ")")}
     }
+
+  ${methodDef(apply)}
+    $applyN[${tparams(n).mkString(", ")}, Z]($f)(${params(n).mkString(", ")})(${tparams(n).mkString(", ")})
 """
+
+
     }
 
     packageLine + s"""
-import play.api.libs.json.{Writes, OWrites, JsPath}
-import play.api.libs.functional.syntax._
+import play.api.libs.json.{Writes, OWrites, JsObject}
 
 object $className {
 
+  def apply1[A1, Z](f: Z => Option[A1])(key1: String)(implicit A1: Writes[A1]): OWrites[Z] =
+    OWrites(z => JsObject((key1, A1.writes(f(z).get)) :: Nil))
+
   def apply[A1, Z](f: Z => Option[A1])(key1: String)(implicit A1: Writes[A1]): OWrites[Z] =
-    Writes.at(JsPath \\ key1)(A1).contramap(Function.unlift(f))
+    apply1(f)(key1)(A1)
 
   ${arities.map(method).mkString("\n")}
 }
@@ -67,11 +81,21 @@ object $className {
     val method: Int => String = { n =>
       val values = (1 to n).map("a" + _)
       val zipped = (tparams(n), params(n)).zipped.map((t, k) => s"$t.reads(json \\ $k)").toList
+
+      val apply = "apply"
+      val applyN = "apply" + n
+      val f = "f"
+
+      def methodDef(name: String) = s"""def $name[${tparams(n).mkString(", ")}, Z]($f: (${tparams(n).mkString(", ")}) => Z)(${params(n).map(_ + ": String").mkString(", ")})(implicit ${tparams(n).map(t => s"${t}: Reads[${t}]").mkString(", ")}): Reads[Z] ="""
+
 s"""
-  def apply[${tparams(n).mkString(", ")}, Z](f: (${tparams(n).mkString(", ")}) => Z)(${params(n).map(_ + ": String").mkString(", ")})(implicit ${tparams(n).map(t => s"${t}: Reads[${t}]").mkString(", ")}): Reads[Z] =
+  ${methodDef(applyN)}
     Reads[Z](json =>
       ${zipped.tail.foldLeft(zipped.head){(result, a) => "G(" + result + ", " + a + ")"}}.map{ case ${values.mkString(" ~ ")} => f(${values.mkString(", ")})}
     )
+
+  ${methodDef(apply)}
+    $applyN[${tparams(n).mkString(", ")}, Z]($f)(${params(n).mkString(", ")})(${tparams(n).mkString(", ")})
 """
     }
 
@@ -86,8 +110,11 @@ object $className {
     functionalCanBuildApplicative[JsResult]
 
 
-  def apply[A1, Z](f: A1 => Z)(key1: String)(implicit A1: Reads[A1]): Reads[Z] =
+  def apply1[A1, Z](f: A1 => Z)(key1: String)(implicit A1: Reads[A1]): Reads[Z] =
     Reads.at(JsPath \\ key1)(A1).map(f)
+
+  def apply[A1, Z](f: A1 => Z)(key1: String)(implicit A1: Reads[A1]): Reads[Z] =
+    apply1[A1, Z](f)(key1)(A1)
 
   ${arities.map(method).mkString("\n")}
 }
@@ -96,12 +123,29 @@ object $className {
 
   private val formats: String => String = { className =>
     val method: Int => String = { n =>
+      val apply = "apply"
+      val applyN = "apply" + n
+      val applyFunc = "applyFunc"
+      val unapplyFunc = "unapplyFunc"
+      val R = "R"
+      val W = "W"
+
+      val ps: String = {
+        if(n == 1) tparams(n).mkString(", ")
+        else tparams(n).mkString("(", ", ", ")")
+      }
+
+      def methodDef(name: String) = s"""def $name[${tparams(n).mkString(", ")}, Z]($applyFunc: $ps => Z, $unapplyFunc: Z => Option[$ps])(${params(n).map(_ + ": String").mkString(", ")})(implicit ${tparams(n).map(t => s"$t$R: Reads[${t}]").mkString(", ")}, ${tparams(n).map(t => s"$t$W: Writes[${t}]").mkString(", ")}): OFormat[Z] ="""
+
 s"""
-  def apply[${tparams(n).mkString(", ")}, Z](applyFunc: (${tparams(n).mkString(", ")}) => Z, unapplyFunc: Z => Option[(${tparams(n).mkString(", ")})])(${params(n).map(_ + ": String").mkString(", ")})(implicit ${tparams(n).map(t => s"${t}R: Reads[${t}]").mkString(", ")}, ${tparams(n).map(t => s"${t}W: Writes[${t}]").mkString(", ")}): OFormat[Z] =
+  ${methodDef(applyN)}
     OFormat(
-      CaseClassReads(applyFunc)(${params(n).mkString(", ")}),
-      CaseClassWrites(unapplyFunc)(${params(n).mkString(", ")})
+      CaseClassReads($applyFunc)(${params(n).mkString(", ")}),
+      CaseClassWrites($unapplyFunc)(${params(n).mkString(", ")})
     )
+
+  ${methodDef(apply)}
+    $applyN[${tparams(n).mkString(", ")}, Z]($applyFunc, $unapplyFunc)(${params(n).mkString(", ")})(${tparams(n).map(_ + R).mkString(", ")}, ${tparams(n).map(_ + W).mkString(", ")})
 """
     }
 
@@ -109,14 +153,7 @@ s"""
 import play.api.libs.json.{Reads, Writes, OFormat}
 
 object $className {
-
-  def apply[A1, Z](applyFunc: A1 => Z, unapplyFunc: Z => Option[A1])(key1: String)(implicit A1R: Reads[A1], A1W: Writes[A1]): OFormat[Z] =
-    OFormat(
-      CaseClassReads(applyFunc)(key1),
-      CaseClassWrites(unapplyFunc)(key1)
-    )
-
-  ${arities.map(method).mkString("\n")}
+  ${(1 +: arities).map(method).mkString("\n")}
 }
 """
   }
