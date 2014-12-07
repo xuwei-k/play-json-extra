@@ -7,7 +7,7 @@ import sbtbuildinfo.Plugin._
 
 object Generate extends Build {
 
-  final val PlayVersion = "2.4.0-M1"
+  final val PlayVersion = "2.4.0-M2"
   private val generateSources = taskKey[Unit]("generate main source files")
   private val generatedSourceDir = "generated"
   private val cleanSrc = taskKey[Unit]("clean generated sources")
