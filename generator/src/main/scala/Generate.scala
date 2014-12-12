@@ -125,6 +125,8 @@ object $className {
     val method: Int => String = { n =>
       val apply = "apply"
       val applyN = "apply" + n
+      val readsAndWrites = "readsAndWrites"
+      val readsAndWritesN = "readsAndWrites" + n
       val applyFunc = "applyFunc"
       val unapplyFunc = "unapplyFunc"
       val R = "R"
@@ -135,7 +137,25 @@ object $className {
         else tparams(n).mkString("(", ", ", ")")
       }
 
-      def methodDef(name: String) = s"""def $name[${tparams(n).mkString(", ")}, Z]($applyFunc: $ps => Z, $unapplyFunc: Z => Option[$ps])(${params(n).map(_ + ": String").mkString(", ")})(implicit ${tparams(n).map(t => s"$t$R: Reads[${t}]").mkString(", ")}, ${tparams(n).map(t => s"$t$W: Writes[${t}]").mkString(", ")}): OFormat[Z] ="""
+      val keys = params(n).map(_ + ": String").mkString(", ")
+      val reads = tparams(n).map(t => s"$t$R: Reads[${t}]").mkString(", ")
+      val writes = tparams(n).map(t => s"$t$W: Writes[${t}]").mkString(", ")
+      val typeParams = tparams(n).mkString(", ")
+      val builderN = "Builder" + n
+      val paramValues = params(n).mkString(", ")
+
+      def methodDef(name: String) =
+        s"""def $name[$typeParams, Z]($applyFunc: $ps => Z, $unapplyFunc: Z => Option[$ps])($keys)(implicit $reads, $writes): OFormat[Z] ="""
+
+      def readsAndWritesMethod(name: String) = s"""
+  def $name[R]($keys): $builderN[R] =
+    new $builderN($paramValues)"""
+
+      val builder = s"""
+  final class $builderN[R]($keys) {
+    def build[${tparams(n).mkString(", ")}, W]($applyFunc: $ps => R, $unapplyFunc: W => Option[$ps])(implicit $reads, $writes): (Reads[R], OWrites[W]) =
+      (CaseClassReads($applyFunc)($paramValues), CaseClassWrites($unapplyFunc)($paramValues))
+  }"""
 
 s"""
   ${methodDef(applyN)}
@@ -146,11 +166,15 @@ s"""
 
   ${methodDef(apply)}
     $applyN[${tparams(n).mkString(", ")}, Z]($applyFunc, $unapplyFunc)(${params(n).mkString(", ")})(${tparams(n).map(_ + R).mkString(", ")}, ${tparams(n).map(_ + W).mkString(", ")})
+
+$builder
+${readsAndWritesMethod(readsAndWrites)}
+${readsAndWritesMethod(readsAndWritesN)}
 """
     }
 
     packageLine + s"""
-import play.api.libs.json.{Reads, Writes, OFormat}
+import play.api.libs.json.{Reads, Writes, OFormat, OWrites}
 
 object $className {
   ${(1 +: arities).map(method).mkString("\n")}
