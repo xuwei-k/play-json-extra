@@ -4,8 +4,8 @@
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.xuwei-k/play-json-extra_2.11/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.xuwei-k/play-json-extra_2.11)
 
 
-- [Maven Central Repository Search](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22com.github.xuwei-k%22%20AND%20a%3A%22play-json-extra_2.10%22)
-- [Maven Central](http://repo1.maven.org/maven2/com/github/xuwei-k/play-json-extra_2.10/)
+- [Maven Central Repository Search](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22com.github.xuwei-k%22%20AND%20a%3A%22play-json-extra_2.11%22)
+- [Maven Central](http://repo1.maven.org/maven2/com/github/xuwei-k/play-json-extra_2.11/)
 
 ### motivation and example
 
