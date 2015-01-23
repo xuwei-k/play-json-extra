@@ -23,7 +23,7 @@ object Generate {
   private def generate(dir: File): Unit = {
     dir.mkdir
     List(
-      "Writes" -> writes, "Reads" -> reads, "Formats" -> formats
+      "Writes" -> writes, "Reads" -> reads, "Formats" -> formats, "CoproductFormats" -> coproduct
     ).foreach{ case (name, contents) =>
       val className = "CaseClass" + name
       val f = new File(dir, className + ".scala").toPath
@@ -35,6 +35,72 @@ object Generate {
   private val arities = (2 to 22)
   private def tparams(n: Int) = (1 to n).map("A" + _)
   private def params(n: Int) = (1 to n).map("key" + _)
+
+  private val coproduct: String => String = { className =>
+    val ReadsAlternative = "F"
+    val ReadsAndWrites = "ReadsAndWrites"
+    val readsAndWrites = "readsAndWrites"
+    val WritesBuilder = s"WritesBuilder[B1]"
+
+    val method: Int => String = { n =>
+
+      val t = tparams(n).mkString(", ")
+
+s"""  implicit class ReadsAndWrites$n[$t](a: FunctionalBuilder[OFormat]#CanBuild$n[$t]) {
+    sealed abstract class $WritesBuilder{
+      def apply[B2](f2: B2 => Option[($t)])(implicit B2: ClassTag[B2]): $ReadsAndWrites[B1, B2]
+    }
+
+    def $readsAndWrites[B1](f1: ($t) => B1): $WritesBuilder =
+      new $WritesBuilder {
+        override def apply[B2](f2: B2 => Option[($t)])(implicit B2: ClassTag[B2]): $ReadsAndWrites[B1, B2] = {
+          val f = a[B1](f1, Function.unlift(f2.asInstanceOf[B1 => Option[($t)]]))
+          $ReadsAndWrites(f, f.asInstanceOf[OWrites[B2]], B2)
+        }
+      }
+  }
+
+  def format[Z, ${tparams(n).map(_ + " <: Z").mkString(", ")}](${(1 to n).map(i => s"a$i: $ReadsAndWrites[Z, A$i]").mkString(", ")}): OFormat[Z] = {
+    OFormat(
+      ${(1 to n).map(i => s"a$i.reads").reduceLeft{ (x, y) => s"$ReadsAlternative.|($x, $y)" }},
+      OWrites[Z]{
+        ${(1 to n).map(i => s"case a$i.C(a) => a$i.writes.writes(a)").mkString("; ")}
+      }
+    )
+  }
+"""
+    }
+
+    val one = s"""
+  implicit class ReadsAndWrites1[A1](a: OFormat[A1]) {
+    sealed abstract class $WritesBuilder{
+      def apply[B2](f2: B2 => Option[A1])(implicit B2: ClassTag[B2]): $ReadsAndWrites[B1, B2]
+    }
+
+    def $readsAndWrites[B1](f1: A1 => B1): $WritesBuilder =
+      new $WritesBuilder {
+        override def apply[B2](f2: B2 => Option[A1])(implicit B2: ClassTag[B2]): $ReadsAndWrites[B1, B2] = {
+          $ReadsAndWrites(a.map(f1), OWrites[B2](b2 => a.writes(f2(b2).get)), B2)
+        }
+      }
+  }"""
+
+packageLine + s"""
+import play.api.libs.functional.{Alternative, FunctionalBuilder}
+import play.api.libs.json.{OFormat, OWrites, Reads}
+import scala.reflect.ClassTag
+
+final case class ReadsAndWrites[A, B](reads: Reads[A], writes: OWrites[B], C: ClassTag[B])
+
+object $className {
+  private[this] val $ReadsAlternative: Alternative[Reads] = Reads.alternative
+
+$one
+
+${(2 to 21) map method mkString "\n"}
+}
+"""
+  }
 
   private val writes: String => String = { className =>
     val method: Int => String = { n =>
