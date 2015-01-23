@@ -38,35 +38,6 @@ object Generate extends Build {
     )
   )
 
-  val updateReadme = { state: State =>
-    val extracted = Project.extract(state)
-    val scalaV = extracted get scalaBinaryVersion
-    val v = extracted get version
-    val org =  extracted get organization
-    val moduleName = extracted get name
-    val snapshotOrRelease = if(extracted get isSnapshot) "snapshots" else "releases"
-    val readme = "README.md"
-    val readmeFile = file(readme)
-    val SonatypeURL = "https://oss.sonatype.org/service/local/repositories"
-    val newReadme = Predef.augmentString(IO.read(readmeFile)).lines.map{ line =>
-      val matchReleaseOrSnapshot = line.contains("SNAPSHOT") == v.contains("SNAPSHOT")
-      if(line.startsWith("libraryDependencies") && matchReleaseOrSnapshot){
-        s"""libraryDependencies += "${org}" %% "${moduleName}" % "$v""""
-      }else if(line.contains(SonatypeURL) && matchReleaseOrSnapshot){
-        s"- [API Documentation](${SonatypeURL}/${snapshotOrRelease}/archive/${org.replace('.','/')}/${moduleName}_${scalaV}/${v}/${moduleName}_${scalaV}-${v}-javadoc.jar/!/index.html)"
-      }else line
-    }.mkString("", "\n", "\n")
-    IO.write(readmeFile, newReadme)
-    val git = new Git(extracted get baseDirectory)
-    git.add(readme) ! state.log
-    git.commit("update " + readme) ! state.log
-    "git diff HEAD^" ! state.log
-    state
-  }
-
-  val updateReadmeProcess: ReleaseStep = updateReadme
-
-
   // https://groups.google.com/d/topic/simple-build-tool/_bBUQk4dIAE/discussion
   lazy val generator = Project(
     "generator", file("generator")
@@ -92,7 +63,7 @@ object Generate extends Build {
     organization := "com.github.xuwei-k",
     licenses := Seq("MIT License" -> url("http://www.opensource.org/licenses/mit-license.php")),
     homepage := Some(url("https://github.com/xuwei-k/play-json-extra")),
-    commands += Command.command("updateReadme")(updateReadme),
+    commands += Command.command("updateReadme")(UpdateReadme.updateReadme),
     buildInfoKeys := Seq[BuildInfoKey](
       organization,
       name,
@@ -123,7 +94,7 @@ object Generate extends Build {
       runTest,
       setReleaseVersion,
       commitReleaseVersion,
-      updateReadmeProcess,
+      UpdateReadme.updateReadmeProcess,
       tagRelease,
       ReleaseStep(
         action = state => Project.extract(state).runTask(PgpKeys.publishSigned, state)._1,
@@ -131,8 +102,7 @@ object Generate extends Build {
       ),
       setNextVersion,
       commitNextVersion,
-      updateReadmeProcess,
-      ReleaseStep(state => Project.extract(state).runTask(SonatypeKeys.sonatypeReleaseAll, state)._1),
+      UpdateReadme.updateReadmeProcess,
       pushChanges
     ),
     credentials ++= PartialFunction.condOpt(sys.env.get("SONATYPE_USER") -> sys.env.get("SONATYPE_PASS")){
