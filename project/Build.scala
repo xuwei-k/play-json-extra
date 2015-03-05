@@ -19,7 +19,7 @@ object Generate extends Build {
   ).getOrElse("master")
 
   val commonSettins = Seq(
-    scalaVersion := "2.10.4",
+    scalaVersion := "2.10.5",
     crossScalaVersions := scalaVersion.value :: "2.11.6" :: Nil,
     scalacOptions ++= (
       "-deprecation" ::
