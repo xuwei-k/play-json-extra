@@ -18,6 +18,12 @@ object Generate extends Build {
     sys.process.Process("git rev-parse HEAD").lines_!.head
   ).getOrElse("master")
 
+  private[this] val unusedWarnings = (
+    "-Ywarn-unused" ::
+    "-Ywarn-unused-import" ::
+    Nil
+  )
+
   val commonSettins = Seq(
     scalaVersion := "2.10.5",
     crossScalaVersions := scalaVersion.value :: "2.11.6" :: Nil,
@@ -29,13 +35,11 @@ object Generate extends Build {
       "-language:higherKinds" ::
       "-language:implicitConversions" ::
       Nil
-    ),
-    scalacOptions in compile ++= (
-      if(scalaVersion.value startsWith "2.11")
-        Seq("-Ywarn-unused", "-Ywarn-unused-import")
-      else
-        Nil
-    )
+    ) ++ PartialFunction.condOpt(CrossVersion.partialVersion(scalaVersion.value)){
+      case Some((2, v)) if v >= 11 => unusedWarnings
+    }.toList.flatten
+  ) ++ Seq(Compile, Test).flatMap(c =>
+    scalacOptions in (c, console) ~= {_.filterNot(unusedWarnings.toSet)}
   )
 
   // https://groups.google.com/d/topic/simple-build-tool/_bBUQk4dIAE/discussion
