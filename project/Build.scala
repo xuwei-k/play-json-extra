@@ -25,9 +25,11 @@ object Generate extends Build {
     Nil
   )
 
+  private[this] val Scala210 = "2.10.5"
+
   val commonSettins = Seq(
-    scalaVersion := "2.10.5",
-    crossScalaVersions := scalaVersion.value :: "2.11.6" :: Nil,
+    scalaVersion := Scala210,
+    crossScalaVersions := Scala210 :: "2.11.6" :: Nil,
     scalacOptions ++= (
       "-deprecation" ::
       "-unchecked" ::
