@@ -146,7 +146,7 @@ object $className {
   private val reads: String => String = { className =>
     val method: Int => String = { n =>
       val values = (1 to n).map("a" + _)
-      val zipped = (tparams(n), params(n)).zipped.map((t, k) => s"$t.reads(json \\ $k)").toList
+      val zipped = (tparams(n), params(n)).zipped.map((t, k) => s"Reads.at[$t](JsPath \\ $k)($t)").toList
 
       val apply = "apply"
       val applyN = "apply" + n
@@ -156,9 +156,7 @@ object $className {
 
 s"""
   ${methodDef(applyN)}
-    Reads[Z](json =>
-      ${zipped.tail.foldLeft(zipped.head){(result, a) => "G(" + result + ", " + a + ")"}}.map{ case ${values.mkString(" ~ ")} => f(${values.mkString(", ")})}
-    )
+    ${zipped.tail.foldLeft(zipped.head){(result, a) => "G(" + result + ", " + a + ")"}}.map{ case ${values.mkString(" ~ ")} => f(${values.mkString(", ")})}
 
   ${methodDef(apply)}
     $applyN[${tparams(n).mkString(", ")}, Z]($f)(${params(n).mkString(", ")})(${tparams(n).mkString(", ")})
@@ -172,8 +170,8 @@ import play.api.libs.functional.{FunctionalCanBuild, ~}
 
 object $className {
 
-  private[this] val G: FunctionalCanBuild[JsResult] =
-    functionalCanBuildApplicative[JsResult]
+  private[this] val G: FunctionalCanBuild[Reads] =
+    functionalCanBuildApplicative[Reads]
 
 
   def apply1[A1, Z](f: A1 => Z)(key1: String)(implicit A1: Reads[A1]): Reads[Z] =
