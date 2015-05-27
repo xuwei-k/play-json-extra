@@ -24,7 +24,7 @@ object User {
 }
 ```
 
-[Play provides Json macros](https://www.playframework.com/documentation/2.3.x/ScalaJsonInception). Yes it is useful, but I want to **specify Json keys explicitly** sometime like [argonaut casecodecN](https://github.com/argonaut-io/argonaut/blob/v6.1-M4/src/test/scala/argonaut/example/JsonExample.scala#L27)
+[Play provides Json macros](https://www.playframework.com/documentation/2.4.x/ScalaJsonInception). Yes it is useful, but I want to **specify Json keys explicitly** sometime like [argonaut casecodecN](https://github.com/argonaut-io/argonaut/blob/v6.1/src/test/scala/argonaut/example/JsonExample.scala#L27)
 
 ```scala
 import play.api.libs.json._
@@ -38,7 +38,7 @@ object User {
 }
 ```
 
-### latest stable version for play2.3
+### latest stable version for play2.4
 
 ```scala
 libraryDependencies += "com.github.xuwei-k" %% "play-json-extra" % "0.3.0"
@@ -46,7 +46,7 @@ libraryDependencies += "com.github.xuwei-k" %% "play-json-extra" % "0.3.0"
 
 - [API Documentation](https://oss.sonatype.org/service/local/repositories/releases/archive/com/github/xuwei-k/play-json-extra_2.10/0.3.0/play-json-extra_2.10-0.3.0-javadoc.jar/!/index.html)
 
-### snapshot version for play2.3
+### snapshot version for play2.4
 
 ```scala
 resolvers += Opts.resolver.sonatypeSnapshots
