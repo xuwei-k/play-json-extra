@@ -51,7 +51,7 @@ object BBB {
   ).readsAndWrites[AAA](apply)(unapply)
 }
 
-final case class CCC(c: Long, d: List[Int], e: Option[String]) extends AAA{
+final case class CCC(c: Long, d: List[Int], e: String) extends AAA{
   def toJson = CCC.writes.writes(this)
 }
 
@@ -61,7 +61,7 @@ object CCC {
   val readsAndWrites = (
     (__ \ "c").format[Long] and
     (__ \ "d").format[List[Int]] and
-    (__ \ "e").format[Option[String]]
+    (__ \ "e").format[String]
   ).readsAndWrites[AAA](apply)(unapply)
 }
 
