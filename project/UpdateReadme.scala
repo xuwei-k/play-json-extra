@@ -1,5 +1,5 @@
 import sbt._, Keys._
-import sbtrelease._
+import sbtrelease.ReleasePlugin.autoImport.ReleaseStep
 
 object UpdateReadme {
 
@@ -22,7 +22,7 @@ object UpdateReadme {
       }else line
     }.mkString("", "\n", "\n")
     IO.write(readmeFile, newReadme)
-    val git = new Git(extracted get baseDirectory)
+    val git = new sbtrelease.Git(extracted get baseDirectory)
     git.add(readme) ! state.log
     git.commit("update " + readme) ! state.log
     "git diff HEAD^" ! state.log

@@ -1,7 +1,8 @@
 import sbt._, Keys._
 import sbtrelease._
+import sbtrelease.ReleasePlugin.autoImport._
+import sbtrelease.ReleaseStateTransformations._
 import xerial.sbt.Sonatype._
-import ReleaseStateTransformations._
 import com.typesafe.sbt.pgp.PgpKeys
 import sbtbuildinfo.Plugin._
 
@@ -61,7 +62,7 @@ object Generate extends Build {
   lazy val playJsonExtra = Project(
     rootProjectId, file(".")
   ).settings(
-    commonSettins ++ ReleasePlugin.releaseSettings ++ sonatypeSettings ++ buildInfoSettings : _*
+    commonSettins ++ sonatypeSettings ++ buildInfoSettings
   ).settings(
     name := "play-json-extra",
     organization := "com.github.xuwei-k",
@@ -91,7 +92,7 @@ object Generate extends Build {
       val stripTestScope = stripIf { n => n.label == "dependency" && (n \ "scope").text == "test" }
       new RuleTransformer(stripTestScope).transform(node)(0)
     },
-    ReleasePlugin.ReleaseKeys.releaseProcess := Seq[ReleaseStep](
+    releaseProcess := Seq[ReleaseStep](
       checkSnapshotDependencies,
       inquireVersions,
       runClean,
