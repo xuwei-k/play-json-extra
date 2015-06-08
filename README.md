@@ -56,4 +56,7 @@ libraryDependencies += "com.github.xuwei-k" %% "play-json-extra" % "0.3.1-SNAPSH
 
 - [API Documentation](https://oss.sonatype.org/service/local/repositories/snapshots/archive/com/github/xuwei-k/play-json-extra_2.10/0.3.1-SNAPSHOT/play-json-extra_2.10-0.3.1-SNAPSHOT-javadoc.jar/!/index.html)
 
+### old versions
 
+- for play 2.3 <https://github.com/xuwei-k/play-json-extra/tree/play2.3>
+- for play 2.2 <https://github.com/xuwei-k/play-json-extra/tree/play2.2>
