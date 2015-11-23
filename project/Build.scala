@@ -29,6 +29,7 @@ object Generate extends Build {
 
   val commonSettins = Seq(
     scalaVersion := Scala210,
+    fullResolvers ~= {_.filterNot(_.name == "jcenter")},
     crossScalaVersions := Scala210 :: "2.11.6" :: Nil,
     scalacOptions ++= (
       "-deprecation" ::
