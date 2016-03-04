@@ -38,7 +38,7 @@ object User {
 }
 ```
 
-### latest stable version for play2.4
+### latest stable version for play2.5
 
 ```scala
 libraryDependencies += "com.github.xuwei-k" %% "play-json-extra" % "0.3.0"
@@ -46,7 +46,7 @@ libraryDependencies += "com.github.xuwei-k" %% "play-json-extra" % "0.3.0"
 
 - [API Documentation](https://oss.sonatype.org/service/local/repositories/releases/archive/com/github/xuwei-k/play-json-extra_2.10/0.3.0/play-json-extra_2.10-0.3.0-javadoc.jar/!/index.html)
 
-### snapshot version for play2.4
+### snapshot version for play2.5
 
 ```scala
 resolvers += Opts.resolver.sonatypeSnapshots
@@ -58,5 +58,6 @@ libraryDependencies += "com.github.xuwei-k" %% "play-json-extra" % "0.3.1-SNAPSH
 
 ### old versions
 
+- for play 2.4 <https://github.com/xuwei-k/play-json-extra/tree/play2.4>
 - for play 2.3 <https://github.com/xuwei-k/play-json-extra/tree/play2.3>
 - for play 2.2 <https://github.com/xuwei-k/play-json-extra/tree/play2.2>

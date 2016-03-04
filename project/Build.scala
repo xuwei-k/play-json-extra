@@ -9,7 +9,7 @@ import sbtbuildinfo.BuildInfoPlugin.autoImport._
 
 object Generate extends Build {
 
-  final val PlayVersion = "2.4.0"
+  final val PlayVersion = "2.5.0"
   private val generateSources = taskKey[Unit]("generate main source files")
   private val generatedSourceDir = "generated"
   private val cleanSrc = taskKey[Unit]("clean generated sources")
@@ -26,12 +26,12 @@ object Generate extends Build {
     Nil
   )
 
-  private[this] val Scala210 = "2.10.6"
+  private[this] val Scala211 = "2.11.7"
 
   val commonSettins = Seq(
-    scalaVersion := Scala210,
+    scalaVersion := Scala211,
     fullResolvers ~= {_.filterNot(_.name == "jcenter")},
-    crossScalaVersions := Scala210 :: "2.11.7" :: Nil,
+    crossScalaVersions := Scala211 :: Nil,
     scalacOptions ++= (
       "-deprecation" ::
       "-unchecked" ::
@@ -40,9 +40,7 @@ object Generate extends Build {
       "-language:higherKinds" ::
       "-language:implicitConversions" ::
       Nil
-    ) ++ PartialFunction.condOpt(CrossVersion.partialVersion(scalaVersion.value)){
-      case Some((2, v)) if v >= 11 => unusedWarnings
-    }.toList.flatten
+    ) ++ unusedWarnings
   ) ++ Seq(Compile, Test).flatMap(c =>
     scalacOptions in (c, console) ~= {_.filterNot(unusedWarnings.toSet)}
   )

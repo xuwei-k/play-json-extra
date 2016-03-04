@@ -165,13 +165,12 @@ s"""
 
     packageLine + s"""
 import play.api.libs.json.{Reads, JsPath, JsValue, JsResult}
-import play.api.libs.functional.syntax.functionalCanBuildApplicative
 import play.api.libs.functional.{FunctionalCanBuild, ~}
 
 object $className {
 
   private[this] val G: FunctionalCanBuild[Reads] =
-    functionalCanBuildApplicative[Reads]
+    FunctionalCanBuild.functionalCanBuildApplicative[Reads]
 
 
   def apply1[A1, Z](f: A1 => Z)(key1: String)(implicit A1: Reads[A1]): Reads[Z] =
