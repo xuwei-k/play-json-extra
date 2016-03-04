@@ -4,7 +4,8 @@ import sbtrelease.ReleasePlugin.autoImport._
 import sbtrelease.ReleaseStateTransformations._
 import xerial.sbt.Sonatype._
 import com.typesafe.sbt.pgp.PgpKeys
-import sbtbuildinfo.Plugin._
+import sbtbuildinfo.BuildInfoPlugin
+import sbtbuildinfo.BuildInfoPlugin.autoImport._
 
 object Generate extends Build {
 
@@ -65,7 +66,7 @@ object Generate extends Build {
   lazy val playJsonExtra = Project(
     rootProjectId, file(".")
   ).settings(
-    commonSettins ++ sonatypeSettings ++ buildInfoSettings
+    commonSettins ++ sonatypeSettings
   ).settings(
     name := "play-json-extra",
     organization := "com.github.xuwei-k",
@@ -82,7 +83,6 @@ object Generate extends Build {
       licenses,
       "playVersion" -> PlayVersion
     ),
-    sourceGenerators in Compile <+= buildInfo,
     buildInfoPackage := "play.jsonext",
     buildInfoObject := "PlayJsonExtraBuildInfo",
     pomPostProcess := { node =>
@@ -158,5 +158,5 @@ object Generate extends Build {
         <tag>{if(isSnapshot.value) gitHash else { "v" + version.value }}</tag>
       </scm>
     )
-  )
+  ).enablePlugins(BuildInfoPlugin)
 }
