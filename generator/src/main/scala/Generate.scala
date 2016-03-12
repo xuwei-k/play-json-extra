@@ -1,7 +1,7 @@
 package play.jsonext
 
 import java.io.File
-import java.nio.file.{Files, Path}
+import java.nio.file.Files
 import java.nio.charset.Charset
 import java.util.Collections.singletonList
 
@@ -164,7 +164,7 @@ s"""
     }
 
     packageLine + s"""
-import play.api.libs.json.{Reads, JsPath, JsValue, JsResult}
+import play.api.libs.json.{Reads, JsPath}
 import play.api.libs.functional.{FunctionalCanBuild, ~}
 
 object $className {

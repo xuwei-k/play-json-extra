@@ -1,6 +1,6 @@
 package play.jsonext
 
-import play.api.libs.json.{Reads, JsPath, JsValue, JsResult}
+import play.api.libs.json.{Reads, JsPath}
 import play.api.libs.functional.{FunctionalCanBuild, ~}
 
 object CaseClassReads {
