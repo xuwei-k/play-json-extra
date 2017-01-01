@@ -2,7 +2,7 @@ import sbtrelease.ReleaseStateTransformations._
 import xerial.sbt.Sonatype._
 import com.typesafe.sbt.pgp.PgpKeys
 
-val PlayVersion = "2.5.1"
+val PlayVersion = "2.6.0-M1"
 val generateSources = taskKey[Unit]("generate main source files")
 val generatedSourceDir = "generated"
 val cleanSrc = taskKey[Unit]("clean generated sources")
@@ -24,7 +24,7 @@ val Scala211 = "2.11.8"
 val commonSettins = Seq(
   scalaVersion := Scala211,
   fullResolvers ~= {_.filterNot(_.name == "jcenter")},
-  crossScalaVersions := Scala211 :: Nil,
+  crossScalaVersions := Scala211 :: "2.12.1" :: Nil,
   scalacOptions ++= (
     "-deprecation" ::
     "-unchecked" ::
@@ -86,6 +86,7 @@ lazy val playJsonExtra = Project(
     val stripTestScope = stripIf { n => n.label == "dependency" && (n \ "scope").text == "test" }
     new RuleTransformer(stripTestScope).transform(node)(0)
   },
+  releaseCrossBuild := true,
   releaseProcess := Seq[ReleaseStep](
     checkSnapshotDependencies,
     inquireVersions,

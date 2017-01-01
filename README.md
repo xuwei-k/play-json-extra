@@ -3,8 +3,8 @@
 [![Build Status](https://secure.travis-ci.org/xuwei-k/play-json-extra.png)](http://travis-ci.org/xuwei-k/play-json-extra)
 
 
-- [Maven Central Repository Search](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22com.github.xuwei-k%22%20AND%20a%3A%22play-json-extra_2.11%22)
-- [Maven Central](http://repo1.maven.org/maven2/com/github/xuwei-k/play-json-extra_2.11/)
+- [Maven Central Repository Search](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22com.github.xuwei-k%22%20AND%20a%3A%22play-json-extra_2.12%22)
+- [Maven Central](http://repo1.maven.org/maven2/com/github/xuwei-k/play-json-extra_2.12/)
 
 ### motivation and example
 
@@ -38,26 +38,24 @@ object User {
 }
 ```
 
-### latest stable version for play2.5
+### latest stable version for play2.6
 
 ```scala
-libraryDependencies += "com.github.xuwei-k" %% "play-json-extra" % "0.4.1"
+libraryDependencies += "com.github.xuwei-k" %% "play-json-extra" % "0.5.0-M1"
 ```
 
-- [API Documentation](https://oss.sonatype.org/service/local/repositories/releases/archive/com/github/xuwei-k/play-json-extra_2.11/0.4.1/play-json-extra_2.11-0.4.1-javadoc.jar/!/index.html)
+- [API Documentation](https://oss.sonatype.org/service/local/repositories/releases/archive/com/github/xuwei-k/play-json-extra_2.11/0.5.0-M1/play-json-extra_2.11-0.5.0-M1-javadoc.jar/!/index.html)
 
-### snapshot version for play2.5
+### snapshot version for play2.6
 
 ```scala
 resolvers += Opts.resolver.sonatypeSnapshots
 
-libraryDependencies += "com.github.xuwei-k" %% "play-json-extra" % "0.4.2-SNAPSHOT"
+libraryDependencies += "com.github.xuwei-k" %% "play-json-extra" % "0.5.0-SNAPSHOT"
 ```
 
-- [API Documentation](https://oss.sonatype.org/service/local/repositories/snapshots/archive/com/github/xuwei-k/play-json-extra_2.11/0.4.2-SNAPSHOT/play-json-extra_2.11-0.4.2-SNAPSHOT-javadoc.jar/!/index.html)
+- [API Documentation](https://oss.sonatype.org/service/local/repositories/snapshots/archive/com/github/xuwei-k/play-json-extra_2.11/0.5.0-SNAPSHOT/play-json-extra_2.11-0.5.0-SNAPSHOT-javadoc.jar/!/index.html)
 
-### old versions
+### old version
 
-- for play 2.4 <https://github.com/xuwei-k/play-json-extra/tree/play2.4>
-- for play 2.3 <https://github.com/xuwei-k/play-json-extra/tree/play2.3>
-- for play 2.2 <https://github.com/xuwei-k/play-json-extra/tree/play2.2>
+- for play 2.5 <https://github.com/xuwei-k/play-json-extra/tree/play2.5>

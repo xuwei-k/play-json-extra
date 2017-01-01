@@ -2,13 +2,17 @@ language: scala
 
 sudo: false
 
+scala:
+- 2.11.8
+- 2.12.1
+
 jdk:
   - oraclejdk8
 
 script:
   - git config core.whitespace tab-in-indent,trailing-space,space-before-tab,cr-at-eol
   - git show --oneline --check
-  - sbt checkGenerate test $(if [[ "${TRAVIS_PULL_REQUEST}" == "false" && "${TRAVIS_BRANCH}" == "play2.5" ]]; then echo "publish"; fi)
+  - sbt ++$TRAVIS_SCALA_VERSION checkGenerate test $(if [[ "${TRAVIS_PULL_REQUEST}" == "false" && "${TRAVIS_BRANCH}" == "master" ]]; then echo "publish"; fi)
 
 env:
   global:
