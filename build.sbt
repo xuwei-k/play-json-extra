@@ -2,7 +2,7 @@ import sbtrelease.ReleaseStateTransformations._
 import xerial.sbt.Sonatype._
 import com.typesafe.sbt.pgp.PgpKeys
 
-val PlayVersion = "2.5.0"
+val PlayVersion = "2.5.1"
 val generateSources = taskKey[Unit]("generate main source files")
 val generatedSourceDir = "generated"
 val cleanSrc = taskKey[Unit]("clean generated sources")
@@ -127,8 +127,8 @@ lazy val playJsonExtra = Project(
   },
   aggregate := false,
   libraryDependencies += "com.typesafe.play" %% "play-json" % PlayVersion % "provided",
-  libraryDependencies += "org.scalacheck" %% "scalacheck" % "1.12.5" % "test",
-  libraryDependencies += "com.github.xuwei-k" %% "applybuilder" % "0.2.1" % "test",
+  libraryDependencies += "org.scalacheck" %% "scalacheck" % "1.13.4" % "test",
+  libraryDependencies += "com.github.xuwei-k" %% "applybuilder" % "0.2.2" % "test",
   packageSrc in Compile := (packageSrc in Compile).dependsOn(compile in Compile).value,
   watchSources ++= ((sourceDirectory in generator).value ** "*.scala").get,
   cleanSrc := IO.delete((scalaSource in Compile).value / generatedSourceDir),
