@@ -2,7 +2,7 @@ import sbtrelease.ReleaseStateTransformations._
 import xerial.sbt.Sonatype._
 import com.typesafe.sbt.pgp.PgpKeys
 
-val PlayVersion = "2.5.1"
+val PlayVersion = "2.5.10"
 val generateSources = taskKey[Unit]("generate main source files")
 val generatedSourceDir = "generated"
 val cleanSrc = taskKey[Unit]("clean generated sources")
