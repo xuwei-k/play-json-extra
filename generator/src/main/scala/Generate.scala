@@ -146,17 +146,28 @@ object $className {
   private val reads: String => String = { className =>
     val method: Int => String = { n =>
       val values = (1 to n).map("a" + _)
-      val zipped = (tparams(n), params(n)).zipped.map((t, k) => s"Reads.at[$t](JsPath \\ $k)($t)").toList
+      val zippedString = (tparams(n), params(n)).zipped.map((t, k) => s"JsPath \\ $k").toList
+      val zippedPath = (tparams(n), params(n)).zipped.map((t, k) => s"Reads.at[$t]($k)($t)").toList
 
       val apply = "apply"
       val applyN = "apply" + n
+      val fromPaths = "fromPaths"
+      val fromPathsN = fromPaths + n
       val f = "f"
+
+      def pathMethodDef(name: String) = s"""def $name[${tparams(n).mkString(", ")}, Z]($f: (${tparams(n).mkString(", ")}) => Z)(${params(n).map(_ + ": JsPath").mkString(", ")})(implicit ${tparams(n).map(t => s"${t}: Reads[${t}]").mkString(", ")}): Reads[Z] ="""
 
       def methodDef(name: String) = s"""def $name[${tparams(n).mkString(", ")}, Z]($f: (${tparams(n).mkString(", ")}) => Z)(${params(n).map(_ + ": String").mkString(", ")})(implicit ${tparams(n).map(t => s"${t}: Reads[${t}]").mkString(", ")}): Reads[Z] ="""
 
 s"""
+  ${pathMethodDef(fromPathsN)}
+    ${zippedPath.tail.foldLeft(zippedPath.head){(result, a) => "G(" + result + ", " + a + ")"}}.map{ case ${values.mkString(" ~ ")} => f(${values.mkString(", ")})}
+
+  ${pathMethodDef(fromPaths)}
+    $fromPathsN[${tparams(n).mkString(", ")}, Z]($f)(${params(n).mkString(", ")})(${tparams(n).mkString(", ")})
+
   ${methodDef(applyN)}
-    ${zipped.tail.foldLeft(zipped.head){(result, a) => "G(" + result + ", " + a + ")"}}.map{ case ${values.mkString(" ~ ")} => f(${values.mkString(", ")})}
+    $fromPathsN[${tparams(n).mkString(", ")}, Z]($f)(${zippedString.mkString(", ")})(${tparams(n).mkString(", ")})
 
   ${methodDef(apply)}
     $applyN[${tparams(n).mkString(", ")}, Z]($f)(${params(n).mkString(", ")})(${tparams(n).mkString(", ")})
