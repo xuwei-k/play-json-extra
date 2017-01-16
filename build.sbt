@@ -88,6 +88,7 @@ lazy val playJsonExtra = Project(
   releaseCrossBuild := true,
   releaseProcess := Seq[ReleaseStep](
     checkSnapshotDependencies,
+    releaseStepTask(checkGenerate),
     inquireVersions,
     runClean,
     runTest,
