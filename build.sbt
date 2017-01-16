@@ -5,7 +5,6 @@ import com.typesafe.sbt.pgp.PgpKeys
 val PlayVersion = "2.6.0-M1"
 val generateSources = taskKey[Unit]("generate main source files")
 val generatedSourceDir = "generated"
-val cleanSrc = taskKey[Unit]("clean generated sources")
 val rootProjectId = "play-json-extra"
 val checkGenerate = taskKey[Unit]("check generate")
 
@@ -130,11 +129,7 @@ lazy val playJsonExtra = Project(
   libraryDependencies += "com.typesafe.play" %% "play-json" % PlayVersion % "provided",
   libraryDependencies += "org.scalacheck" %% "scalacheck" % "1.13.4" % "test",
   libraryDependencies += "com.github.xuwei-k" %% "applybuilder" % "0.2.2" % "test",
-  packageSrc in Compile := (packageSrc in Compile).dependsOn(compile in Compile).value,
   watchSources ++= ((sourceDirectory in generator).value ** "*.scala").get,
-  cleanSrc := IO.delete((scalaSource in Compile).value / generatedSourceDir),
-  clean := (clean dependsOn cleanSrc).value,
-  compile in Compile := (compile in Compile).dependsOn(generateSources in generator).value,
   description := "play2 json extra module",
   pomExtra := (
     <developers>
