@@ -104,6 +104,7 @@ lazy val playJsonExtra = Project(
     setNextVersion,
     commitNextVersion,
     UpdateReadme.updateReadmeProcess,
+    ReleaseStep(action = Command.process("sonatypeReleaseAll", _)),
     pushChanges
   ),
   credentials ++= PartialFunction.condOpt(sys.env.get("SONATYPE_USER") -> sys.env.get("SONATYPE_PASS")){
