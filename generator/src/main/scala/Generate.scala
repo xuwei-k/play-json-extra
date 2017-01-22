@@ -7,14 +7,14 @@ import java.util.Collections.singletonList
 
 object Generate {
 
-  private def deleteDir(file: File){
+  private def deleteDir(file: File): Unit = {
     if(!file.delete() && file.isDirectory){
       Option(file.listFiles).toList.flatten.foreach(deleteDir)
       file.delete
     }
   }
 
-  def main(args: Array[String]){
+  def main(args: Array[String]): Unit = {
     val dir = new File(args.headOption.getOrElse(sys.error("invalid args " + args.mkString(", "))))
     deleteDir(dir)
     generate(dir)
