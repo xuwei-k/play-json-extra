@@ -1,7 +1,7 @@
 package play.jsonext
 
 import java.io.File
-import java.nio.file.{Files, Path}
+import java.nio.file.Files
 import java.nio.charset.Charset
 import java.util.Collections.singletonList
 
