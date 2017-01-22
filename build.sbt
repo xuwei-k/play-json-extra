@@ -23,7 +23,7 @@ val Scala210 = "2.10.6"
 val commonSettins = Seq(
   scalaVersion := Scala210,
   fullResolvers ~= {_.filterNot(_.name == "jcenter")},
-  crossScalaVersions := Scala210 :: "2.11.7" :: Nil,
+  crossScalaVersions := Scala210 :: "2.11.8" :: Nil,
   scalacOptions ++= (
     "-deprecation" ::
     "-unchecked" ::
