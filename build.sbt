@@ -130,8 +130,8 @@ lazy val playJsonExtra = Project(
   },
   aggregate := false,
   libraryDependencies += "com.typesafe.play" %% "play-json" % PlayVersion % "provided",
-  libraryDependencies += "org.scalacheck" %% "scalacheck" % "1.12.5" % "test",
-  libraryDependencies += "com.github.xuwei-k" %% "applybuilder" % "0.2.0" % "test",
+  libraryDependencies += "org.scalacheck" %% "scalacheck" % "1.13.4" % "test",
+  libraryDependencies += "com.github.xuwei-k" %% "applybuilder" % "0.2.2" % "test",
   watchSources ++= ((sourceDirectory in generator).value ** "*.scala").get,
   description := "play2 json extra module",
   pomExtra := (
