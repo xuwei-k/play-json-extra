@@ -2,7 +2,7 @@ import sbtrelease.ReleaseStateTransformations._
 import xerial.sbt.Sonatype._
 import com.typesafe.sbt.pgp.PgpKeys
 
-val PlayVersion = "2.4.0"
+val PlayVersion = "2.4.9"
 val generateSources = taskKey[Unit]("generate main source files")
 val generatedSourceDir = "generated"
 val rootProjectId = "play-json-extra"
