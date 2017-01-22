@@ -175,7 +175,7 @@ s"""
     }
 
     packageLine + s"""
-import play.api.libs.json.{Reads, JsPath, JsValue, JsResult}
+import play.api.libs.json.{Reads, JsPath}
 import play.api.libs.functional.syntax.functionalCanBuildApplicative
 import play.api.libs.functional.{FunctionalCanBuild, ~}
 
