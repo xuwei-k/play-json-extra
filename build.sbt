@@ -1,12 +1,12 @@
 import sbtrelease.ReleaseStateTransformations._
-import xerial.sbt.Sonatype._
 import com.typesafe.sbt.pgp.PgpKeys
+import org.scalajs.sbtplugin.cross.{CrossProject, CrossType}
 
-val PlayVersion = "2.6.0-M1"
+val PlayVersion = "2.6.0-M2"
 val generateSources = taskKey[Unit]("generate main source files")
 val generatedSourceDir = "generated"
-val rootProjectId = "play-json-extra"
 val checkGenerate = taskKey[Unit]("check generate")
+val playJsonExtraJVMRef = LocalProject(UpdateReadme.moduleName + "JVM")
 
 def gitHash: String = scala.util.Try(
   sys.process.Process("git rev-parse HEAD").lines_!.head
@@ -33,49 +33,35 @@ val commonSettings = Seq(
     "-language:higherKinds" ::
     "-language:implicitConversions" ::
     Nil
-  ) ++ unusedWarnings
-) ++ Seq(Compile, Test).flatMap(c =>
-  scalacOptions in (c, console) ~= {_.filterNot(unusedWarnings.toSet)}
-)
-
-// https://groups.google.com/d/topic/simple-build-tool/_bBUQk4dIAE/discussion
-lazy val generator = Project(
-  "generator", file("generator")
-).settings(
-  commonSettings: _*
-).settings(
-  publishArtifact := false,
-  publish := {},
-  publishLocal := {},
-  generateSources := {
-    val dir = ((scalaSource in Compile in LocalProject(rootProjectId)).value / generatedSourceDir).toString
-    val cp = (fullClasspath in Compile).value
-    (runner in Compile).value.run("play.jsonext.Generate", Attributed.data(cp), Seq(dir), streams.value.log)
-  }
-)
-
-lazy val playJsonExtra = Project(
-  rootProjectId, file(".")
-).settings(
-  commonSettings ++ sonatypeSettings
-).settings(
-  name := "play-json-extra",
+  ) ++ unusedWarnings,
+  releaseCrossBuild := true,
+  releaseProcess := Seq[ReleaseStep](
+    checkSnapshotDependencies,
+    releaseStepTask(checkGenerate in playJsonExtraJVMRef),
+    inquireVersions,
+    runClean,
+    runTest,
+    setReleaseVersion,
+    commitReleaseVersion,
+    UpdateReadme.updateReadmeProcess,
+    tagRelease,
+    ReleaseStep(
+      action = { state =>
+        val extracted = Project extract state
+        extracted.runAggregated(PgpKeys.publishSigned in Global in extracted.get(thisProjectRef), state)
+      },
+      enableCrossBuild = true
+    ),
+    setNextVersion,
+    commitNextVersion,
+    UpdateReadme.updateReadmeProcess,
+    releaseStepCommand("sonatypeReleaseAll"),
+    pushChanges
+  ),
   organization := "com.github.xuwei-k",
   licenses := Seq("MIT License" -> url("http://www.opensource.org/licenses/mit-license.php")),
   homepage := Some(url("https://github.com/xuwei-k/play-json-extra")),
   commands += Command.command("updateReadme")(UpdateReadme.updateReadme),
-  buildInfoKeys := Seq[BuildInfoKey](
-    organization,
-    name,
-    version,
-    scalaVersion,
-    sbtVersion,
-    scalacOptions,
-    licenses,
-    "playVersion" -> PlayVersion
-  ),
-  buildInfoPackage := "play.jsonext",
-  buildInfoObject := "PlayJsonExtraBuildInfo",
   pomPostProcess := { node =>
     import scala.xml._
     import scala.xml.transform._
@@ -86,27 +72,6 @@ lazy val playJsonExtra = Project(
     val stripTestScope = stripIf { n => n.label == "dependency" && (n \ "scope").text == "test" }
     new RuleTransformer(stripTestScope).transform(node)(0)
   },
-  releaseCrossBuild := true,
-  releaseProcess := Seq[ReleaseStep](
-    checkSnapshotDependencies,
-    releaseStepTask(checkGenerate),
-    inquireVersions,
-    runClean,
-    runTest,
-    setReleaseVersion,
-    commitReleaseVersion,
-    UpdateReadme.updateReadmeProcess,
-    tagRelease,
-    ReleaseStep(
-      action = state => Project.extract(state).runTask(PgpKeys.publishSigned, state)._1,
-      enableCrossBuild = true
-    ),
-    setNextVersion,
-    commitNextVersion,
-    UpdateReadme.updateReadmeProcess,
-    ReleaseStep(action = Command.process("sonatypeReleaseAll", _)),
-    pushChanges
-  ),
   credentials ++= PartialFunction.condOpt(sys.env.get("SONATYPE_USER") -> sys.env.get("SONATYPE_PASS")){
     case (Some(user), Some(pass)) =>
       Credentials("Sonatype Nexus Repository Manager", "oss.sonatype.org", user, pass)
@@ -114,25 +79,10 @@ lazy val playJsonExtra = Project(
   scalacOptions in (Compile, doc) ++= {
     val tag = if(isSnapshot.value) gitHash else { "v" + version.value }
     Seq(
-      "-sourcepath", (baseDirectory in LocalProject(rootProjectId)).value.getAbsolutePath,
+      "-sourcepath", (baseDirectory in playJsonExtraJVMRef).value.getAbsolutePath,
       "-doc-source-url", s"https://github.com/xuwei-k/play-json-extra/tree/${tag}€{FILE_PATH}.scala"
     )
   },
-  checkGenerate := {
-    val _ = (generateSources in generator).value
-    val diff = sys.process.Process("git diff").lines_!
-    assert(diff.size == 0, diff)
-  },
-  initialCommands in console += {
-    Seq(
-      "play.api.libs.json._", "play.jsonext._"
-    ).map("import " + _ + ";").mkString
-  },
-  aggregate := false,
-  libraryDependencies += "com.typesafe.play" %% "play-json" % PlayVersion % "provided",
-  libraryDependencies += "org.scalacheck" %% "scalacheck" % "1.13.4" % "test",
-  libraryDependencies += "com.github.xuwei-k" %% "applybuilder" % "0.2.2" % "test",
-  watchSources ++= ((sourceDirectory in generator).value ** "*.scala").get,
   description := "play2 json extra module",
   pomExtra := (
     <developers>
@@ -148,4 +98,72 @@ lazy val playJsonExtra = Project(
       <tag>{if(isSnapshot.value) gitHash else { "v" + version.value }}</tag>
     </scm>
   )
+) ++ Seq(Compile, Test).flatMap(c =>
+  scalacOptions in (c, console) ~= {_.filterNot(unusedWarnings.toSet)}
+)
+
+val noPublish = Seq(
+  PgpKeys.publishLocalSigned := {},
+  PgpKeys.publishSigned := {},
+  publishLocal := {},
+  publish := {},
+  publishArtifact in Compile := false
+)
+
+// https://groups.google.com/d/topic/simple-build-tool/_bBUQk4dIAE/discussion
+lazy val generator = Project(
+  "generator", file("generator")
+).settings(
+  commonSettings,
+  noPublish,
+  generateSources := {
+    val dir = ((baseDirectory in LocalRootProject).value / "src/main/scala" / generatedSourceDir).toString
+    val cp = (fullClasspath in Compile).value
+    (runner in Compile).value.run("play.jsonext.Generate", Attributed.data(cp), Seq(dir), streams.value.log)
+  }
+)
+
+lazy val playJsonExtra = CrossProject(
+  UpdateReadme.moduleName, file("."), CrossType.Pure
+).settings(
+  commonSettings,
+  name := UpdateReadme.moduleName,
+  buildInfoKeys := Seq[BuildInfoKey](
+    organization,
+    name,
+    version,
+    scalaVersion,
+    sbtVersion,
+    scalacOptions,
+    licenses,
+    "playVersion" -> PlayVersion
+  ),
+  buildInfoPackage := "play.jsonext",
+  buildInfoObject := "PlayJsonExtraBuildInfo",
+  initialCommands in console += {
+    Seq(
+      "play.api.libs.json._", "play.jsonext._"
+    ).map("import " + _ + ";").mkString
+  },
+  checkGenerate := {
+    val _ = (generateSources in generator).value
+    val diff = sys.process.Process("git diff").lines_!
+    assert(diff.size == 0, diff)
+  },
+  libraryDependencies += "com.typesafe.play" %%% "play-json" % PlayVersion % "provided",
+  libraryDependencies += "org.scalacheck" %%% "scalacheck" % "1.13.4" % "test",
+  libraryDependencies += "com.github.xuwei-k" %%% "applybuilder" % "0.2.2" % "test",
+  watchSources ++= ((sourceDirectory in generator).value ** "*.scala").get
 ).enablePlugins(BuildInfoPlugin)
+
+lazy val playJsonExtraJVM = playJsonExtra.jvm
+lazy val playJsonExtraJS = playJsonExtra.js
+
+val root = Project("root", file(".")).settings(
+  commonSettings,
+  noPublish,
+  scalaSource in Compile := file("dummy"),
+  scalaSource in Test := file("dummy")
+).aggregate(
+  playJsonExtraJVM, playJsonExtraJS, generator
+)
