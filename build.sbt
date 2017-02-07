@@ -20,7 +20,7 @@ val unusedWarnings = (
 
 val Scala211 = "2.11.8"
 
-val commonSettins = Seq(
+val commonSettings = Seq(
   scalaVersion := Scala211,
   fullResolvers ~= {_.filterNot(_.name == "jcenter")},
   crossScalaVersions := Scala211 :: "2.12.1" :: Nil,
@@ -42,7 +42,7 @@ val commonSettins = Seq(
 lazy val generator = Project(
   "generator", file("generator")
 ).settings(
-  commonSettins: _*
+  commonSettings: _*
 ).settings(
   publishArtifact := false,
   publish := {},
@@ -57,7 +57,7 @@ lazy val generator = Project(
 lazy val playJsonExtra = Project(
   rootProjectId, file(".")
 ).settings(
-  commonSettins ++ sonatypeSettings
+  commonSettings ++ sonatypeSettings
 ).settings(
   name := "play-json-extra",
   organization := "com.github.xuwei-k",
