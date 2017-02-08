@@ -16,8 +16,10 @@ object UpdateReadme {
     val SonatypeURL = "https://oss.sonatype.org/service/local/repositories"
     val newReadme = Predef.augmentString(IO.read(readmeFile)).lines.map{ line =>
       val matchReleaseOrSnapshot = (line.contains("SNAPSHOT") == v.contains("SNAPSHOT")) && line.contains(moduleName)
-      if(line.startsWith("libraryDependencies") && matchReleaseOrSnapshot){
+      if(line.startsWith("libraryDependencies") && matchReleaseOrSnapshot && line.contains(" %% ")){
         s"""libraryDependencies += "${org}" %% "${moduleName}" % "$v""""
+      }else if(line.startsWith("libraryDependencies") && matchReleaseOrSnapshot && line.contains(" %%% ")){
+        s"""libraryDependencies += "${org}" %%% "${moduleName}" % "$v""""
       }else if(line.contains(SonatypeURL) && matchReleaseOrSnapshot){
         s"- [API Documentation](${SonatypeURL}/${snapshotOrRelease}/archive/${org.replace('.','/')}/${moduleName}_${scalaV}/${v}/${moduleName}_${scalaV}-${v}-javadoc.jar/!/index.html)"
       }else line

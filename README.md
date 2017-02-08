@@ -44,6 +44,12 @@ object User {
 libraryDependencies += "com.github.xuwei-k" %% "play-json-extra" % "0.5.0-M3"
 ```
 
+for scala-js
+
+```scala
+libraryDependencies += "com.github.xuwei-k" %%% "play-json-extra" % "0.5.0-M3"
+```
+
 - [API Documentation](https://oss.sonatype.org/service/local/repositories/releases/archive/com/github/xuwei-k/play-json-extra_2.11/0.5.0-M3/play-json-extra_2.11-0.5.0-M3-javadoc.jar/!/index.html)
 
 ### snapshot version for play2.6
@@ -52,6 +58,14 @@ libraryDependencies += "com.github.xuwei-k" %% "play-json-extra" % "0.5.0-M3"
 resolvers += Opts.resolver.sonatypeSnapshots
 
 libraryDependencies += "com.github.xuwei-k" %% "play-json-extra" % "0.5.0-SNAPSHOT"
+```
+
+for scala-js
+
+```scala
+resolvers += Opts.resolver.sonatypeSnapshots
+
+libraryDependencies += "com.github.xuwei-k" %%% "play-json-extra" % "0.5.0-SNAPSHOT"
 ```
 
 - [API Documentation](https://oss.sonatype.org/service/local/repositories/snapshots/archive/com/github/xuwei-k/play-json-extra_2.11/0.5.0-SNAPSHOT/play-json-extra_2.11-0.5.0-SNAPSHOT-javadoc.jar/!/index.html)
