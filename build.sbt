@@ -142,7 +142,6 @@ lazy val playJsonExtra = CrossProject(
     version,
     scalaVersion,
     sbtVersion,
-    scalacOptions,
     licenses,
     "playVersion" -> PlayVersion
   ),
