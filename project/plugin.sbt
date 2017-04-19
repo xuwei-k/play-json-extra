@@ -16,6 +16,6 @@ addSbtPlugin("org.xerial.sbt" % "sbt-sonatype" % "1.1")
 
 addSbtPlugin("com.eed3si9n" % "sbt-buildinfo" % "0.6.1")
 
-addSbtPlugin("org.scala-js" % "sbt-scalajs" % "0.6.14")
+addSbtPlugin("org.scala-js" % "sbt-scalajs" % "0.6.15")
 
 fullResolvers ~= {_.filterNot(_.name == "jcenter")}
