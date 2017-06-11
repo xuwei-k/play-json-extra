@@ -9,6 +9,11 @@ scala:
 jdk:
   - oraclejdk8
 
+addons:
+  apt:
+    packages:
+    - oracle-java8-installer
+
 script:
   - git config core.whitespace tab-in-indent,trailing-space,space-before-tab,cr-at-eol
   - git show --oneline --check
