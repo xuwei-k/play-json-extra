@@ -2,7 +2,7 @@ import sbtrelease.ReleaseStateTransformations._
 import com.typesafe.sbt.pgp.PgpKeys
 import org.scalajs.sbtplugin.cross.{CrossProject, CrossType}
 
-val PlayVersion = "2.6.0"
+val PlayVersion = "2.6.2"
 val generateSources = taskKey[Unit]("generate main source files")
 val generatedSourceDir = "generated"
 val checkGenerate = taskKey[Unit]("check generate")
