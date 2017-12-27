@@ -13,7 +13,7 @@ val tagName = Def.setting{
 }
 val tagOrHash = Def.setting{
   if(isSnapshot.value) {
-    sys.process.Process("git rev-parse HEAD").lines_!.head
+    sys.process.Process("git rev-parse HEAD").lineStream_!.head
   } else {
     tagName.value
   }
@@ -160,7 +160,7 @@ lazy val playJsonExtra = CrossProject(
   },
   checkGenerate := {
     val _ = (generateSources in generator).value
-    val diff = sys.process.Process("git diff").lines_!
+    val diff = sys.process.Process("git diff").lineStream_!
     assert(diff.size == 0, diff)
   },
   libraryDependencies += "com.typesafe.play" %%% "play-json" % PlayVersion % "provided",

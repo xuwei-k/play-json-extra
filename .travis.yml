@@ -17,7 +17,7 @@ addons:
 script:
   - git config core.whitespace tab-in-indent,trailing-space,space-before-tab,cr-at-eol
   - git show --oneline --check
-  - sbt ++$TRAVIS_SCALA_VERSION checkGenerate test $(if [[ "${TRAVIS_PULL_REQUEST}" == "false" && "${TRAVIS_BRANCH}" == "master" ]]; then echo "publish"; fi)
+  - sbt "++${TRAVIS_SCALA_VERSION}!" checkGenerate test $(if [[ "${TRAVIS_PULL_REQUEST}" == "false" && "${TRAVIS_BRANCH}" == "master" ]]; then echo "publish"; fi)
 
 env:
   global:
