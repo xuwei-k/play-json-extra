@@ -73,7 +73,7 @@ val commonSettings = Seq(
     pushChanges
   ),
   organization := "com.github.xuwei-k",
-  licenses := Seq("MIT License" -> url("http://www.opensource.org/licenses/mit-license.php")),
+  licenses := Seq("MIT License" -> url("https://opensource.org/licenses/mit-license")),
   homepage := Some(url("https://github.com/xuwei-k/play-json-extra")),
   commands += Command.command("updateReadme")(UpdateReadme.updateReadme),
   pomPostProcess := { node =>
