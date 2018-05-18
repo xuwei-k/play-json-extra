@@ -1,6 +1,6 @@
 import sbtrelease.ReleaseStateTransformations._
 import com.typesafe.sbt.pgp.PgpKeys
-import org.scalajs.sbtplugin.cross.{CrossProject, CrossType}
+import sbtcrossproject.{CrossProject, CrossType}
 
 val PlayVersion = "2.6.9"
 val generateSources = taskKey[Unit]("generate main source files")
@@ -137,8 +137,8 @@ lazy val generator = Project(
   }
 )
 
-lazy val playJsonExtra = CrossProject(
-  UpdateReadme.moduleName, file("."), CrossType.Pure
+lazy val playJsonExtra = CrossProject(UpdateReadme.moduleName, file("."))(JVMPlatform, JSPlatform).crossType(
+  CrossType.Pure
 ).settings(
   commonSettings,
   name := UpdateReadme.moduleName,
