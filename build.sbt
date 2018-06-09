@@ -21,7 +21,6 @@ val tagOrHash = Def.setting{
 
 val unusedWarnings = (
   "-Ywarn-unused" ::
-  "-Ywarn-unused-import" ::
   Nil
 )
 
