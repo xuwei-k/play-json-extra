@@ -2,7 +2,7 @@ import sbtrelease.ReleaseStateTransformations._
 import com.typesafe.sbt.pgp.PgpKeys
 import sbtcrossproject.{CrossProject, CrossType}
 
-val PlayVersion = "2.6.9"
+val playJsonVersion = settingKey[String]("")
 val generateSources = taskKey[Unit]("generate main source files")
 val generatedSourceDir = "generated"
 val checkGenerate = taskKey[Unit]("check generate")
@@ -35,7 +35,7 @@ val commonSettings = Seq(
   ),
   scalaVersion := Scala211,
   fullResolvers ~= {_.filterNot(_.name == "jcenter")},
-  crossScalaVersions := Scala211 :: "2.12.7" :: "2.13.0-M3" :: Nil,
+  crossScalaVersions := Scala211 :: "2.12.7" :: "2.13.0-M5" :: Nil,
   scalacOptions ++= (
     "-deprecation" ::
     "-unchecked" ::
@@ -148,7 +148,7 @@ lazy val playJsonExtra = CrossProject(UpdateReadme.moduleName, file("."))(JVMPla
     scalaVersion,
     sbtVersion,
     licenses,
-    "playVersion" -> PlayVersion
+    playJsonVersion
   ),
   buildInfoPackage := "play.jsonext",
   buildInfoObject := "PlayJsonExtraBuildInfo",
@@ -162,7 +162,15 @@ lazy val playJsonExtra = CrossProject(UpdateReadme.moduleName, file("."))(JVMPla
     val diff = sys.process.Process("git diff").lineStream_!
     assert(diff.size == 0, diff)
   },
-  libraryDependencies += "com.typesafe.play" %%% "play-json" % PlayVersion % "provided",
+  playJsonVersion := {
+    CrossVersion.partialVersion(scalaVersion.value) match {
+      case Some((2, v)) if v >= 13 =>
+        "2.7.0-RC1"
+      case _ =>
+        "2.6.9"
+    }
+  },
+  libraryDependencies += "com.typesafe.play" %%% "play-json" % playJsonVersion.value % "provided",
   libraryDependencies += "org.scalacheck" %%% "scalacheck" % "1.14.0" % "test",
   libraryDependencies += "com.github.xuwei-k" %%% "applybuilder" % "0.2.3" % "test",
   watchSources ++= ((sourceDirectory in generator).value ** "*.scala").get
