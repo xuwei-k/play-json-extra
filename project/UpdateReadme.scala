@@ -27,7 +27,7 @@ object UpdateReadme {
     IO.write(readmeFile, newReadme)
     val git = new sbtrelease.Git(extracted get baseDirectory)
     git.add(readme) ! state.log
-    git.commit(message = "update " + readme, sign = false) ! state.log
+    git.commit(message = "update " + readme, sign = false, signOff = false) ! state.log
     sys.process.Process("git diff HEAD^") ! state.log
     state
   }
