@@ -35,7 +35,7 @@ val commonSettings = Seq(
   ),
   scalaVersion := Scala211,
   fullResolvers ~= {_.filterNot(_.name == "jcenter")},
-  crossScalaVersions := Scala211 :: "2.12.7" :: "2.13.0-M5" :: Nil,
+  crossScalaVersions := Scala211 :: "2.12.8" :: "2.13.0-M5" :: Nil,
   scalacOptions ++= (
     "-deprecation" ::
     "-unchecked" ::
