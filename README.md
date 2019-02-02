@@ -58,7 +58,7 @@ libraryDependencies += "com.github.xuwei-k" %%% "play-json-extra" % "0.6.1"
 ```scala
 resolvers += Opts.resolver.sonatypeSnapshots
 
-libraryDependencies += "com.github.xuwei-k" %% "play-json-extra" % "0.6.1-SNAPSHOT"
+libraryDependencies += "com.github.xuwei-k" %% "play-json-extra" % "0.6.2-SNAPSHOT"
 ```
 
 for scala-js
@@ -66,10 +66,10 @@ for scala-js
 ```scala
 resolvers += Opts.resolver.sonatypeSnapshots
 
-libraryDependencies += "com.github.xuwei-k" %%% "play-json-extra" % "0.6.1-SNAPSHOT"
+libraryDependencies += "com.github.xuwei-k" %%% "play-json-extra" % "0.6.2-SNAPSHOT"
 ```
 
-- [API Documentation](https://oss.sonatype.org/service/local/repositories/snapshots/archive/com/github/xuwei-k/play-json-extra_2.11/0.6.1-SNAPSHOT/play-json-extra_2.11-0.6.1-SNAPSHOT-javadoc.jar/!/index.html)
+- [API Documentation](https://oss.sonatype.org/service/local/repositories/snapshots/archive/com/github/xuwei-k/play-json-extra_2.11/0.6.2-SNAPSHOT/play-json-extra_2.11-0.6.2-SNAPSHOT-javadoc.jar/!/index.html)
 
 ### old version
 
