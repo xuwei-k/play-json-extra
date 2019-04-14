@@ -35,7 +35,7 @@ val commonSettings = Seq(
   ),
   scalaVersion := Scala211,
   fullResolvers ~= {_.filterNot(_.name == "jcenter")},
-  crossScalaVersions := Scala211 :: "2.12.8" :: "2.13.0-M5" :: Nil,
+  crossScalaVersions := Scala211 :: "2.12.8" :: "2.13.0-RC1" :: Nil,
   scalacOptions ++= (
     "-deprecation" ::
     "-unchecked" ::
@@ -162,10 +162,10 @@ lazy val playJsonExtra = CrossProject(UpdateReadme.moduleName, file("."))(JVMPla
     val diff = sys.process.Process("git diff").lineStream_!
     assert(diff.size == 0, diff)
   },
-  playJsonVersion := "2.7.2",
+  playJsonVersion := "2.7.3",
   libraryDependencies += "com.typesafe.play" %%% "play-json" % playJsonVersion.value % "provided",
   libraryDependencies += "org.scalacheck" %%% "scalacheck" % "1.14.0" % "test",
-  libraryDependencies += "com.github.xuwei-k" %%% "applybuilder" % "0.2.3" % "test",
+  libraryDependencies += "com.github.xuwei-k" %%% "applybuilder" % "0.2.4" % "test",
   watchSources ++= ((sourceDirectory in generator).value ** "*.scala").get
 ).enablePlugins(BuildInfoPlugin).jsSettings(
   scalacOptions += {
