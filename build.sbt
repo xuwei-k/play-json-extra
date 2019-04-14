@@ -40,12 +40,19 @@ val commonSettings = Seq(
     "-deprecation" ::
     "-unchecked" ::
     "-Xlint" ::
-    "-Xfuture" ::
     "-language:existentials" ::
     "-language:higherKinds" ::
     "-language:implicitConversions" ::
     Nil
   ) ++ unusedWarnings,
+  scalacOptions ++= {
+    CrossVersion.partialVersion(scalaVersion.value) match {
+      case Some((2, 11 | 12)) =>
+        Seq("-Xfuture")
+      case _ =>
+        Nil
+    }
+  },
   releaseCrossBuild := true,
   releaseTagName := tagName.value,
   releaseProcess := Seq[ReleaseStep](
