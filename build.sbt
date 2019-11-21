@@ -27,12 +27,7 @@ val unusedWarnings = (
 val Scala212 = "2.12.10"
 
 val commonSettings = Seq(
-  publishTo := Some(
-    if (isSnapshot.value)
-      Opts.resolver.sonatypeSnapshots
-    else
-      Opts.resolver.sonatypeStaging
-  ),
+  publishTo := sonatypePublishToBundle.value,
   scalaVersion := Scala212,
   fullResolvers ~= {_.filterNot(_.name == "jcenter")},
   crossScalaVersions := Scala212 :: "2.13.1" :: Nil,
@@ -72,10 +67,10 @@ val commonSettings = Seq(
       },
       enableCrossBuild = true
     ),
+    releaseStepCommand("sonatypeBundleRelease"),
     setNextVersion,
     commitNextVersion,
     UpdateReadme.updateReadmeProcess,
-    releaseStepCommand("sonatypeReleaseAll"),
     pushChanges
   ),
   organization := "com.github.xuwei-k",
