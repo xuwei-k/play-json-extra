@@ -8,6 +8,8 @@ val generatedSourceDir = "generated"
 val checkGenerate = taskKey[Unit]("check generate")
 val playJsonExtraJVMRef = LocalProject(UpdateReadme.moduleName + "JVM")
 
+Global / onChangedBuildSource := ReloadOnSourceChanges
+
 val tagName = Def.setting{
   s"v${if (releaseUseGlobalVersion.value) (version in ThisBuild).value else version.value}"
 }
