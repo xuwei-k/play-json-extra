@@ -25,13 +25,13 @@ val unusedWarnings = (
   Nil
 )
 
-val Scala212 = "2.12.11"
+val Scala212 = "2.12.12"
 
 val commonSettings = Seq(
   publishTo := sonatypePublishToBundle.value,
   scalaVersion := Scala212,
   fullResolvers ~= {_.filterNot(_.name == "jcenter")},
-  crossScalaVersions := Scala212 :: "2.13.2" :: Nil,
+  crossScalaVersions := Scala212 :: "2.13.3" :: Nil,
   scalacOptions ++= (
     "-deprecation" ::
     "-unchecked" ::
