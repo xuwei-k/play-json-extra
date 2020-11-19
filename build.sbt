@@ -31,7 +31,7 @@ val commonSettings = Seq(
   publishTo := sonatypePublishToBundle.value,
   scalaVersion := Scala212,
   fullResolvers ~= {_.filterNot(_.name == "jcenter")},
-  crossScalaVersions := Scala212 :: "2.13.3" :: Nil,
+  crossScalaVersions := Scala212 :: "2.13.4" :: Nil,
   scalacOptions ++= (
     "-deprecation" ::
     "-unchecked" ::
