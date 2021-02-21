@@ -1,6 +1,6 @@
 # play-json-extra
 
-[![Scala.js](https://www.scala-js.org/assets/badges/scalajs-0.6.14.svg)](https://www.scala-js.org)
+[![Scala.js](https://www.scala-js.org/assets/badges/scalajs-1.5.0.svg)](https://www.scala-js.org)
 [![scaladoc](https://javadoc-badge.appspot.com/com.github.xuwei-k/play-json-extra_2.12.svg?label=scaladoc)](https://javadoc-badge.appspot.com/com.github.xuwei-k/play-json-extra_2.12/play/jsonext/index.html?javadocio=true)
 
 - [Maven Central Repository Search](https://search.maven.org/#search%7Cga%7C1%7Cg%3A%22com.github.xuwei-k%22%20AND%20a%3A%22play-json-extra_2.12%22)
