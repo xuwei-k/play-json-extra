@@ -184,8 +184,8 @@ lazy val playJsonExtraJS = playJsonExtra.js
 val root = Project("root", file(".")).settings(
   commonSettings,
   noPublish,
-  Compile / scalaSource := file("dummy"),
-  Test / scalaSource := file("dummy")
+  Compile / scalaSource := baseDirectory.value / "dummy",
+  Test / scalaSource := baseDirectory.value / "dummy",
 ).aggregate(
   playJsonExtraJVM, playJsonExtraJS, generator
 )
