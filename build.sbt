@@ -10,7 +10,7 @@ val playJsonExtraJVMRef = LocalProject(UpdateReadme.moduleName + "JVM")
 Global / onChangedBuildSource := ReloadOnSourceChanges
 
 val tagName = Def.setting{
-  s"v${if (releaseUseGlobalVersion.value) (version in ThisBuild).value else version.value}"
+  s"v${if (releaseUseGlobalVersion.value) (ThisBuild / version).value else version.value}"
 }
 val tagOrHash = Def.setting{
   if(isSnapshot.value) {
@@ -53,7 +53,7 @@ val commonSettings = Seq(
   releaseTagName := tagName.value,
   releaseProcess := Seq[ReleaseStep](
     checkSnapshotDependencies,
-    releaseStepTask(checkGenerate in playJsonExtraJVMRef),
+    releaseStepTask(playJsonExtraJVMRef / checkGenerate),
     inquireVersions,
     runClean,
     runTest,
@@ -64,7 +64,7 @@ val commonSettings = Seq(
     ReleaseStep(
       action = { state =>
         val extracted = Project extract state
-        extracted.runAggregated(PgpKeys.publishSigned in Global in extracted.get(thisProjectRef), state)
+        extracted.runAggregated(extracted.get(thisProjectRef) / (Global / PgpKeys.publishSigned), state)
       },
       enableCrossBuild = true
     ),
@@ -92,10 +92,10 @@ val commonSettings = Seq(
     case (Some(user), Some(pass)) =>
       Credentials("Sonatype Nexus Repository Manager", "oss.sonatype.org", user, pass)
   }.toList,
-  scalacOptions in (Compile, doc) ++= {
+  (Compile / doc / scalacOptions) ++= {
     val tag = tagOrHash.value
     Seq(
-      "-sourcepath", (baseDirectory in playJsonExtraJVMRef).value.getAbsolutePath,
+      "-sourcepath", (playJsonExtraJVMRef / baseDirectory).value.getAbsolutePath,
       "-doc-source-url", s"https://github.com/xuwei-k/play-json-extra/tree/${tag}€{FILE_PATH}.scala"
     )
   },
@@ -115,7 +115,7 @@ val commonSettings = Seq(
     </scm>
   )
 ) ++ Seq(Compile, Test).flatMap(c =>
-  scalacOptions in (c, console) ~= {_.filterNot(unusedWarnings.toSet)}
+  c / console / scalacOptions ~= {_.filterNot(unusedWarnings.toSet)}
 )
 
 val noPublish = Seq(
@@ -123,7 +123,7 @@ val noPublish = Seq(
   PgpKeys.publishSigned := {},
   publishLocal := {},
   publish := {},
-  publishArtifact in Compile := false
+  Compile / publishArtifact := false
 )
 
 // https://groups.google.com/d/topic/simple-build-tool/_bBUQk4dIAE/discussion
@@ -133,9 +133,9 @@ lazy val generator = Project(
   commonSettings,
   noPublish,
   generateSources := {
-    val dir = ((baseDirectory in LocalRootProject).value / "src/main/scala" / generatedSourceDir).toString
-    val cp = (fullClasspath in Compile).value
-    (runner in Compile).value.run("play.jsonext.Generate", Attributed.data(cp), Seq(dir), streams.value.log)
+    val dir = ((LocalRootProject / baseDirectory).value / "src/main/scala" / generatedSourceDir).toString
+    val cp = (Compile / fullClasspath).value
+    (Compile / runner).value.run("play.jsonext.Generate", Attributed.data(cp), Seq(dir), streams.value.log)
   }
 )
 
@@ -155,13 +155,13 @@ lazy val playJsonExtra = CrossProject(UpdateReadme.moduleName, file("."))(JVMPla
   ),
   buildInfoPackage := "play.jsonext",
   buildInfoObject := "PlayJsonExtraBuildInfo",
-  initialCommands in console += {
+  (console / initialCommands) += {
     Seq(
       "play.api.libs.json._", "play.jsonext._"
     ).map("import " + _ + ";").mkString
   },
   checkGenerate := {
-    val _ = (generateSources in generator).value
+    val _ = (generator / generateSources).value
     val diff = sys.process.Process("git diff").lineStream_!
     assert(diff.size == 0, diff)
   },
@@ -169,10 +169,10 @@ lazy val playJsonExtra = CrossProject(UpdateReadme.moduleName, file("."))(JVMPla
   libraryDependencies += "com.typesafe.play" %%% "play-json" % playJsonVersion.value % "provided",
   libraryDependencies += "org.scalacheck" %%% "scalacheck" % "1.15.3" % "test",
   libraryDependencies += "com.github.xuwei-k" %%% "applybuilder" % "0.3.1" % "test",
-  watchSources ++= ((sourceDirectory in generator).value ** "*.scala").get
+  watchSources ++= ((generator / sourceDirectory).value ** "*.scala").get
 ).enablePlugins(BuildInfoPlugin).jsSettings(
   scalacOptions += {
-    val a = (baseDirectory in LocalRootProject).value.toURI.toString
+    val a = (LocalRootProject / baseDirectory).value.toURI.toString
     val g = "https://raw.githubusercontent.com/xuwei-k/play-json-extra/" + tagOrHash.value
     s"-P:scalajs:mapSourceURI:$a->$g/"
   }
@@ -184,8 +184,8 @@ lazy val playJsonExtraJS = playJsonExtra.js
 val root = Project("root", file(".")).settings(
   commonSettings,
   noPublish,
-  scalaSource in Compile := file("dummy"),
-  scalaSource in Test := file("dummy")
+  Compile / scalaSource := file("dummy"),
+  Test / scalaSource := file("dummy")
 ).aggregate(
   playJsonExtraJVM, playJsonExtraJS, generator
 )
