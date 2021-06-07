@@ -166,7 +166,7 @@ lazy val playJsonExtra = CrossProject(UpdateReadme.moduleName, file("."))(JVMPla
     assert(diff.size == 0, diff)
   },
   playJsonVersion := "2.9.2",
-  libraryDependencies += "com.typesafe.play" %%% "play-json" % playJsonVersion.value % "provided",
+  libraryDependencies += "com.typesafe.play" %%% "play-json" % playJsonVersion.value % "provided" cross CrossVersion.for3Use2_13,
   libraryDependencies += "org.scalacheck" %%% "scalacheck" % "1.15.4" % "test",
   libraryDependencies += "com.github.xuwei-k" %%% "applybuilder" % "0.3.1" % "test",
   watchSources ++= ((generator / sourceDirectory).value ** "*.scala").get
@@ -174,7 +174,13 @@ lazy val playJsonExtra = CrossProject(UpdateReadme.moduleName, file("."))(JVMPla
   scalacOptions += {
     val a = (LocalRootProject / baseDirectory).value.toURI.toString
     val g = "https://raw.githubusercontent.com/xuwei-k/play-json-extra/" + tagOrHash.value
-    s"-P:scalajs:mapSourceURI:$a->$g/"
+    val key = scalaBinaryVersion.value match {
+      case "3" =>
+        "-scalajs-mapSourceURI"
+      case _ =>
+        "-P:scalajs:mapSourceURI"
+    }
+    s"${key}:$a->$g/"
   }
 )
 
