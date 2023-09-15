@@ -113,7 +113,7 @@ ${(2 to 21) map method mkString "\n"}
 
 s"""
   ${methodDef(applyN)}
-    OWrites{ z: Z =>
+    OWrites{ (z: Z) =>
       val tuple = $f(z).get
       ${tparams(n).zip(params(n)).zipWithIndex.map{
         case ((t, k), i) => s"(($k, $t.writes(tuple._${i + 1})))"
