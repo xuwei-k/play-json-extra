@@ -165,8 +165,8 @@ lazy val playJsonExtra = CrossProject(UpdateReadme.moduleName, file("."))(JVMPla
     val diff = sys.process.Process("git diff").lineStream_!
     assert(diff.size == 0, diff)
   },
-  playJsonVersion := "2.10.2",
-  libraryDependencies += "com.typesafe.play" %%% "play-json" % playJsonVersion.value % "provided" cross CrossVersion.for3Use2_13,
+  playJsonVersion := "3.0.0",
+  libraryDependencies += "org.playframework" %%% "play-json" % playJsonVersion.value % "provided" cross CrossVersion.for3Use2_13,
   libraryDependencies += "org.scalacheck" %%% "scalacheck" % "1.17.0" % "test",
   libraryDependencies += "com.github.xuwei-k" %%% "applybuilder" % "0.3.2" % "test",
   watchSources ++= ((generator / sourceDirectory).value ** "*.scala").get
