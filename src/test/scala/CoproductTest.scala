@@ -6,7 +6,7 @@ import play.api.libs.json.{JsObject, OFormat, OWrites, __}
 import CaseClassCoproductFormats._
 
 object CoproductTest extends Properties("coproduct"){
-  property("coproduct") = Prop.forAll { aaa: AAA =>
+  property("coproduct") = Prop.forAll { (aaa: AAA) =>
     val json1 = AAA.format1.writes(aaa)
     json1.as[AAA](AAA.format1) == aaa
     json1.as[AAA](AAA.format2) == aaa
