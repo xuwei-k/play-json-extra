@@ -139,7 +139,7 @@ lazy val generator = Project(
   }
 )
 
-lazy val playJsonExtra = CrossProject(UpdateReadme.moduleName, file("."))(JVMPlatform, JSPlatform).crossType(
+lazy val playJsonExtra = CrossProject(UpdateReadme.moduleName, file("."))(JVMPlatform, JSPlatform, NativePlatform).crossType(
   CrossType.Pure
 ).settings(
   commonSettings,
@@ -184,14 +184,7 @@ lazy val playJsonExtra = CrossProject(UpdateReadme.moduleName, file("."))(JVMPla
   }
 )
 
-lazy val playJsonExtraJVM = playJsonExtra.jvm
-lazy val playJsonExtraJS = playJsonExtra.js
-
-val root = Project("root", file(".")).settings(
-  commonSettings,
-  noPublish,
-  Compile / scalaSource := baseDirectory.value / "dummy",
-  Test / scalaSource := baseDirectory.value / "dummy",
-).aggregate(
-  playJsonExtraJVM, playJsonExtraJS, generator
-)
+commonSettings
+noPublish
+Compile / scalaSource := baseDirectory.value / "dummy"
+Test / scalaSource := baseDirectory.value / "dummy"
