@@ -2,6 +2,7 @@ package play.jsonext
 
 import org.scalacheck._
 import play.api.libs.json.{OWrites, OFormat}
+import _root_.unapply.syntax._
 
 object JsonExtraTest extends Properties("JsonExtra") {
 
@@ -9,7 +10,7 @@ object JsonExtraTest extends Properties("JsonExtra") {
 
   object Foo {
     implicit val fooOFormat: OFormat[Foo] =
-      CaseClassFormats(apply _, unapply _)(
+      CaseClassFormats(apply _, (_: Foo).asTupleOption)(
         "a", "b", "c"
       )
 
@@ -26,7 +27,7 @@ object JsonExtraTest extends Properties("JsonExtra") {
 
   object Arity1 {
     implicit val arity1OFormat: OFormat[Arity1] =
-      CaseClassFormats(apply _, unapply _)("xyz")
+      CaseClassFormats(apply _, (_: Arity1).asTupleOption)("xyz")
 
     implicit val fooArbitrary: Arbitrary[Arity1] = Arbitrary(
       implicitly[Arbitrary[List[Int]]].arbitrary.map(Arity1.apply)

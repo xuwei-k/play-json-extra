@@ -31,7 +31,7 @@ val commonSettings = Seq(
   publishTo := sonatypePublishToBundle.value,
   scalaVersion := Scala212,
   fullResolvers ~= {_.filterNot(_.name == "jcenter")},
-  crossScalaVersions := Scala212 :: "2.13.16" :: Nil,
+  crossScalaVersions := Scala212 :: "2.13.16" :: "3.3.5" :: Nil,
   scalacOptions ++= (
     "-deprecation" ::
     "-unchecked" ::
@@ -165,10 +165,18 @@ lazy val playJsonExtra = CrossProject(UpdateReadme.moduleName, file("."))(JVMPla
     val diff = sys.process.Process("git diff").lineStream_!
     assert(diff.size == 0, diff)
   },
-  playJsonVersion := "3.0.4",
-  libraryDependencies += "org.playframework" %%% "play-json" % playJsonVersion.value % "provided" cross CrossVersion.for3Use2_13,
-  libraryDependencies += "org.scalacheck" %%% "scalacheck" % "1.17.1" % "test",
+  playJsonVersion := {
+    crossProjectPlatform.value match {
+      case NativePlatform =>
+        "3.1.0-M1"
+      case _ =>
+        "3.0.4"
+    }
+  },
+  libraryDependencies += "org.playframework" %%% "play-json" % playJsonVersion.value % "provided",
+  libraryDependencies += "org.scalacheck" %%% "scalacheck" % "1.18.0" % "test",
   libraryDependencies += "com.github.xuwei-k" %%% "applybuilder" % "0.3.2" % "test",
+  libraryDependencies += "com.github.xuwei-k" %%% "unapply" % "0.1.0" % "test",
   watchSources ++= ((generator / sourceDirectory).value ** "*.scala").get
 ).enablePlugins(BuildInfoPlugin).jsSettings(
   scalacOptions += {

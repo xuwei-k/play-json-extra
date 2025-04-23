@@ -4,6 +4,7 @@ import org.scalacheck.{Gen, Arbitrary}
 import play.api.libs.json.OFormat
 
 import scalaz.Monad
+import _root_.unapply.syntax._
 
 final case class TwentyTwo(
   _01: String,
@@ -33,7 +34,7 @@ final case class TwentyTwo(
 object TwentyTwo{
 
   implicit val instance: OFormat[TwentyTwo] =
-    CaseClassFormats.apply22(apply, unapply)(
+    CaseClassFormats.apply22(apply, (_: TwentyTwo).asTupleOption)(
       "_01",
       "_02",
       "_03",
