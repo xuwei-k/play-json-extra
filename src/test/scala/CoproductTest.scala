@@ -4,6 +4,7 @@ import org.scalacheck.{Gen, Arbitrary, Prop, Properties}
 import play.api.libs.functional.syntax._
 import play.api.libs.json.{JsObject, OFormat, OWrites, __}
 import CaseClassCoproductFormats._
+import _root_.unapply.syntax._
 
 object CoproductTest extends Properties("coproduct"){
   property("coproduct") = Prop.forAll { (aaa: AAA) =>
@@ -43,12 +44,12 @@ final case class BBB(a: Int, b: String) extends AAA{
 }
 
 object BBB {
-  val (reads, writes) = CaseClassFormats.readsAndWrites[AAA]("a", "b").build(apply, unapply)
+  val (reads, writes) = CaseClassFormats.readsAndWrites[AAA]("a", "b").build(apply, (_: BBB).asTupleOption)
 
   val readsAndWrites = (
     (__ \ "a").format[Int] and
     (__ \ "b").format[String]
-  ).readsAndWrites[AAA](apply)(unapply)
+  ).readsAndWrites[AAA](apply)((_: BBB).asTupleOption)
 }
 
 final case class CCC(c: Long, d: List[Int], e: String) extends AAA{
@@ -56,13 +57,13 @@ final case class CCC(c: Long, d: List[Int], e: String) extends AAA{
 }
 
 object CCC {
-  val (reads, writes) = CaseClassFormats.readsAndWrites[AAA]("c", "d", "e").build(apply, unapply)
+  val (reads, writes) = CaseClassFormats.readsAndWrites[AAA]("c", "d", "e").build(apply, (_: CCC).asTupleOption)
 
   val readsAndWrites = (
     (__ \ "c").format[Long] and
     (__ \ "d").format[List[Int]] and
     (__ \ "e").format[String]
-  ).readsAndWrites[AAA](apply)(unapply)
+  ).readsAndWrites[AAA](apply)((_: CCC).asTupleOption)
 }
 
 final case class DDD(z: Boolean) extends AAA {
@@ -70,7 +71,7 @@ final case class DDD(z: Boolean) extends AAA {
 }
 
 object DDD {
-  val (reads, writes) = CaseClassFormats.readsAndWrites[AAA]("z").build(apply, unapply)
+  val (reads, writes) = CaseClassFormats.readsAndWrites[AAA]("z").build(apply, (_: DDD).asTupleOption)
 
-  val readsAndWrites = (__ \ "z").format[Boolean].readsAndWrites[AAA](apply)(unapply)
+  val readsAndWrites = (__ \ "z").format[Boolean].readsAndWrites[AAA](apply)((_: DDD).asTupleOption)
 }
