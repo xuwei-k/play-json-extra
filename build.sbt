@@ -174,7 +174,7 @@ lazy val playJsonExtra = CrossProject(UpdateReadme.moduleName, file("."))(JVMPla
     }
   },
   libraryDependencies += "org.playframework" %%% "play-json" % playJsonVersion.value % "provided",
-  libraryDependencies += "org.scalacheck" %%% "scalacheck" % "1.18.1" % "test",
+  libraryDependencies += "org.scalacheck" %%% "scalacheck" % "1.19.0" % "test",
   libraryDependencies += "com.github.xuwei-k" %%% "applybuilder" % "0.3.2" % "test",
   libraryDependencies += "com.github.xuwei-k" %%% "unapply" % "0.1.0" % "test",
   watchSources ++= ((generator / sourceDirectory).value ** "*.scala").get
