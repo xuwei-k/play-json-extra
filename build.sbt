@@ -25,7 +25,7 @@ val unusedWarnings = (
   Nil
 )
 
-val Scala212 = "2.12.20"
+val Scala212 = "2.12.21"
 
 val commonSettings = Seq(
   publishTo := sonatypePublishToBundle.value,
