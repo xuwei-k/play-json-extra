@@ -1,10 +1,9 @@
-scalacOptions ++= (
-  "-deprecation" ::
-  "-unchecked" ::
-  "-language:existentials" ::
-  "-language:higherKinds" ::
-  "-language:implicitConversions" ::
-  Nil
+scalacOptions ++= Seq(
+  "-deprecation",
+  "-unchecked",
+  "-language:existentials",
+  "-language:higherKinds",
+  "-language:implicitConversions",
 )
 
 addSbtPlugin("org.portable-scala" % "sbt-scala-native-crossproject" % "1.3.2")

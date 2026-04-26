@@ -20,9 +20,8 @@ val tagOrHash = Def.setting{
   }
 }
 
-val unusedWarnings = (
-  "-Ywarn-unused" ::
-  Nil
+val unusedWarnings = Seq(
+  "-Ywarn-unused",
 )
 
 val Scala212 = "2.12.21"
@@ -31,14 +30,13 @@ val commonSettings = Seq(
   publishTo := sonatypePublishToBundle.value,
   scalaVersion := Scala212,
   crossScalaVersions := Scala212 :: "2.13.18" :: "3.3.7" :: Nil,
-  scalacOptions ++= (
-    "-deprecation" ::
-    "-unchecked" ::
-    "-Xlint" ::
-    "-language:existentials" ::
-    "-language:higherKinds" ::
-    "-language:implicitConversions" ::
-    Nil
+  scalacOptions ++= Seq(
+    "-deprecation",
+    "-unchecked",
+    "-Xlint",
+    "-language:existentials",
+    "-language:higherKinds",
+    "-language:implicitConversions",
   ) ++ unusedWarnings,
   scalacOptions ++= {
     CrossVersion.partialVersion(scalaVersion.value) match {
