@@ -28,7 +28,7 @@ val unusedWarnings = (
 val Scala212 = "2.12.21"
 
 val commonSettings = Seq(
-  publishTo := sonatypePublishToBundle.value,
+  publishTo := (if (isSnapshot.value) None else localStaging.value),
   scalaVersion := Scala212,
   crossScalaVersions := Scala212 :: "2.13.18" :: "3.3.7" :: Nil,
   scalacOptions ++= (
@@ -67,7 +67,7 @@ val commonSettings = Seq(
       },
       enableCrossBuild = true
     ),
-    releaseStepCommand("sonatypeBundleRelease"),
+    releaseStepCommand("sonaRelease"),
     setNextVersion,
     commitNextVersion,
     UpdateReadme.updateReadmeProcess,
