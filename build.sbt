@@ -13,7 +13,7 @@ val tagName = Def.setting {
 }
 val tagOrHash = Def.setting {
   if (isSnapshot.value) {
-    sys.process.Process("git rev-parse HEAD").lineStream_!.head
+    sys.process.Process("git rev-parse HEAD").lazyLines_!.head
   } else {
     tagName.value
   }
@@ -138,7 +138,7 @@ lazy val generator = Project(
   scalaVersion := Scala3,
   generateSources := {
     val dir = ((LocalRootProject / baseDirectory).value / "src/main/scala" / generatedSourceDir).toString
-    val cp = (Compile / fullClasspath).value
+    val cp = (Compile / fullClasspath).value.map(_.map(fileConverter.value.toPath))
     (Compile / runner).value.run("play.jsonext.Generate", Attributed.data(cp), Seq(dir), streams.value.log)
   }
 )
@@ -168,32 +168,32 @@ lazy val playJsonExtra = projectMatrix
     },
     checkGenerate := {
       val _ = (generator / generateSources).value
-      val diff = sys.process.Process("git diff").lineStream_!
+      val diff = sys.process.Process("git diff").lazyLines_!
       assert(diff.size == 0, diff)
     },
-    libraryDependencies += "org.scalacheck" %%% "scalacheck" % "1.19.0" % "test",
-    libraryDependencies += "com.github.xuwei-k" %%% "applybuilder" % "0.3.2" % "test",
-    libraryDependencies += "com.github.xuwei-k" %%% "unapply" % "0.1.0" % "test",
-    watchSources ++= ((generator / sourceDirectory).value ** "*.scala").get()
+    libraryDependencies += "org.scalacheck" %% "scalacheck" % "1.19.0" % "test",
+    libraryDependencies += "com.github.xuwei-k" %% "applybuilder" % "0.3.2" % "test",
+    libraryDependencies += "com.github.xuwei-k" %% "unapply" % "0.1.0" % "test",
+    watchSources ++= Def.uncached(((generator / sourceDirectory).value ** "*.scala").get())
   )
   .enablePlugins(BuildInfoPlugin)
   .jvmPlatform(
     scalaVersions,
     Def.settings(
-      libraryDependencies += "org.playframework" %%% "play-json" % "3.0.6",
+      libraryDependencies += "org.playframework" %% "play-json" % "3.0.6",
     )
   )
   .nativePlatform(
     scalaVersions,
     Def.settings(
       evictionErrorLevel := Level.Warn,
-      libraryDependencies += "org.playframework" %%% "play-json" % "3.1.0-M10",
+      libraryDependencies += "org.playframework" %% "play-json" % "3.1.0-M10",
     )
   )
   .jsPlatform(
-    scalaVersions,
+    Nil,
     Def.settings(
-      libraryDependencies += "org.playframework" %%% "play-json" % "3.0.6",
+      libraryDependencies += "org.playframework" %% "play-json" % "3.0.6",
       scalacOptions += {
         val a = (LocalRootProject / baseDirectory).value.toURI.toString
         val g = "https://raw.githubusercontent.com/xuwei-k/play-json-extra/" + tagOrHash.value
@@ -208,8 +208,10 @@ lazy val playJsonExtra = projectMatrix
     )
   )
 
-commonSettings
-noPublish
-Compile / scalaSource := baseDirectory.value / "dummy"
-Test / scalaSource := baseDirectory.value / "dummy"
-autoScalaLibrary := false
+val root = rootProject.autoAggregate.settings(
+  commonSettings,
+  noPublish,
+  Compile / scalaSource := baseDirectory.value / "dummy",
+  Test / scalaSource := baseDirectory.value / "dummy",
+  autoScalaLibrary := false
+)
