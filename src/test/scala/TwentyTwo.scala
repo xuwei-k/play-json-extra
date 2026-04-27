@@ -1,10 +1,10 @@
 package play.jsonext
 
-import org.scalacheck.{Gen, Arbitrary}
-import play.api.libs.json.OFormat
-
-import scalaz.Monad
 import _root_.unapply.syntax._
+import org.scalacheck.Arbitrary
+import org.scalacheck.Gen
+import play.api.libs.json.OFormat
+import scalaz.Monad
 
 final case class TwentyTwo(
   _01: String,
@@ -31,7 +31,7 @@ final case class TwentyTwo(
   _22: String
 )
 
-object TwentyTwo{
+object TwentyTwo {
 
   implicit val instance: OFormat[TwentyTwo] =
     CaseClassFormats.apply22(apply, (_: TwentyTwo).asTupleOption)(
@@ -68,10 +68,33 @@ object TwentyTwo{
   implicit val arbitrary: Arbitrary[TwentyTwo] = {
     val s = implicitly[Arbitrary[String]].arbitrary
     Arbitrary(
-      scalaz.ApplyBuilder.apply22(
-        s, s, s, s, s, s, s, s, s, s, s, s, s, s, s, s, s, s, s, s, s, s
-      ).run(apply)
+      scalaz.ApplyBuilder
+        .apply22(
+          s,
+          s,
+          s,
+          s,
+          s,
+          s,
+          s,
+          s,
+          s,
+          s,
+          s,
+          s,
+          s,
+          s,
+          s,
+          s,
+          s,
+          s,
+          s,
+          s,
+          s,
+          s
+        )
+        .run(apply)
     )
   }
- 
+
 }

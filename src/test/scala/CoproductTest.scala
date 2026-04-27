@@ -1,12 +1,18 @@
 package play.jsonext
 
-import org.scalacheck.{Gen, Arbitrary, Prop, Properties}
-import play.api.libs.functional.syntax._
-import play.api.libs.json.{JsObject, OFormat, OWrites, __}
 import CaseClassCoproductFormats._
 import _root_.unapply.syntax._
+import org.scalacheck.Arbitrary
+import org.scalacheck.Gen
+import org.scalacheck.Prop
+import org.scalacheck.Properties
+import play.api.libs.functional.syntax._
+import play.api.libs.json.JsObject
+import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
+import play.api.libs.json.__
 
-object CoproductTest extends Properties("coproduct"){
+object CoproductTest extends Properties("coproduct") {
   property("coproduct") = Prop.forAll { (aaa: AAA) =>
     val json1 = AAA.format1.writes(aaa)
     json1.as[AAA](AAA.format1) == aaa
@@ -18,28 +24,32 @@ object CoproductTest extends Properties("coproduct"){
   }
 }
 
-sealed abstract class AAA extends Product with Serializable{
+sealed abstract class AAA extends Product with Serializable {
   def toJson: JsObject
 }
 
-object AAA{
+object AAA {
   val format1: OFormat[AAA] = OFormat(
     BBB.reads | CCC.reads | DDD.reads,
     OWrites[AAA](_.toJson)
   )
 
   val format2: OFormat[AAA] = CaseClassCoproductFormats.format(
-    BBB.readsAndWrites, CCC.readsAndWrites, DDD.readsAndWrites
+    BBB.readsAndWrites,
+    CCC.readsAndWrites,
+    DDD.readsAndWrites
   )
 
-  implicit val arbitrary: Arbitrary[AAA] = Arbitrary(Gen.oneOf(
-    Gen.resultOf(BBB.apply _),
-    Gen.resultOf(CCC.apply _),
-    Gen.resultOf(DDD.apply _)
-  ))
+  implicit val arbitrary: Arbitrary[AAA] = Arbitrary(
+    Gen.oneOf(
+      Gen.resultOf(BBB.apply _),
+      Gen.resultOf(CCC.apply _),
+      Gen.resultOf(DDD.apply _)
+    )
+  )
 }
 
-final case class BBB(a: Int, b: String) extends AAA{
+final case class BBB(a: Int, b: String) extends AAA {
   def toJson = BBB.writes.writes(this)
 }
 
@@ -48,11 +58,11 @@ object BBB {
 
   val readsAndWrites = (
     (__ \ "a").format[Int] and
-    (__ \ "b").format[String]
+      (__ \ "b").format[String]
   ).readsAndWrites[AAA](apply)((_: BBB).asTupleOption)
 }
 
-final case class CCC(c: Long, d: List[Int], e: String) extends AAA{
+final case class CCC(c: Long, d: List[Int], e: String) extends AAA {
   def toJson = CCC.writes.writes(this)
 }
 
@@ -61,8 +71,8 @@ object CCC {
 
   val readsAndWrites = (
     (__ \ "c").format[Long] and
-    (__ \ "d").format[List[Int]] and
-    (__ \ "e").format[String]
+      (__ \ "d").format[List[Int]] and
+      (__ \ "e").format[String]
   ).readsAndWrites[AAA](apply)((_: CCC).asTupleOption)
 }
 

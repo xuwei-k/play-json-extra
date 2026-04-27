@@ -17,4 +17,8 @@ jobs:
         distribution: adopt
     - uses: coursier/cache-action@v8
     - uses: sbt/setup-sbt@v1
-    - run: sbt checkGenerate "+test"
+    - run: sbt
+           scalafmtSbtCheck
+           "+ scalafmtCheckAll"
+           checkGenerate
+           "+test"

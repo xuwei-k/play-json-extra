@@ -1,5 +1,6 @@
+import sbtcrossproject.CrossProject
+import sbtcrossproject.CrossType
 import sbtrelease.ReleaseStateTransformations._
-import sbtcrossproject.{CrossProject, CrossType}
 
 val playJsonVersion = settingKey[String]("")
 val generateSources = taskKey[Unit]("generate main source files")
@@ -9,11 +10,11 @@ val playJsonExtraJVMRef = LocalProject(UpdateReadme.moduleName + "JVM")
 
 Global / onChangedBuildSource := ReloadOnSourceChanges
 
-val tagName = Def.setting{
+val tagName = Def.setting {
   s"v${if (releaseUseGlobalVersion.value) (ThisBuild / version).value else version.value}"
 }
-val tagOrHash = Def.setting{
-  if(isSnapshot.value) {
+val tagOrHash = Def.setting {
+  if (isSnapshot.value) {
     sys.process.Process("git rev-parse HEAD").lineStream_!.head
   } else {
     tagName.value
@@ -88,8 +89,10 @@ val commonSettings = Seq(
   (Compile / doc / scalacOptions) ++= {
     val tag = tagOrHash.value
     Seq(
-      "-sourcepath", (playJsonExtraJVMRef / baseDirectory).value.getAbsolutePath,
-      "-doc-source-url", s"https://github.com/xuwei-k/play-json-extra/tree/${tag}€{FILE_PATH}.scala"
+      "-sourcepath",
+      (playJsonExtraJVMRef / baseDirectory).value.getAbsolutePath,
+      "-doc-source-url",
+      s"https://github.com/xuwei-k/play-json-extra/tree/${tag}€{FILE_PATH}.scala"
     )
   },
   description := "play2 json extra module",
@@ -107,9 +110,7 @@ val commonSettings = Seq(
       <tag>{tagOrHash.value}</tag>
     </scm>
   )
-) ++ Seq(Compile, Test).flatMap(c =>
-  c / console / scalacOptions ~= {_.filterNot(unusedWarnings.toSet)}
-)
+) ++ Seq(Compile, Test).flatMap(c => c / console / scalacOptions ~= { _.filterNot(unusedWarnings.toSet) })
 
 val noPublish = Seq(
   PgpKeys.publishLocalSigned := {},
@@ -121,7 +122,8 @@ val noPublish = Seq(
 
 // https://groups.google.com/d/topic/simple-build-tool/_bBUQk4dIAE/discussion
 lazy val generator = Project(
-  "generator", file("generator")
+  "generator",
+  file("generator")
 ).settings(
   commonSettings,
   noPublish,
@@ -132,58 +134,63 @@ lazy val generator = Project(
   }
 )
 
-lazy val playJsonExtra = CrossProject(UpdateReadme.moduleName, file("."))(JVMPlatform, JSPlatform, NativePlatform).crossType(
-  CrossType.Pure
-).settings(
-  commonSettings,
-  name := UpdateReadme.moduleName,
-  buildInfoKeys := Seq[BuildInfoKey](
-    organization,
-    name,
-    version,
-    scalaVersion,
-    sbtVersion,
-    licenses,
-    playJsonVersion
-  ),
-  buildInfoPackage := "play.jsonext",
-  buildInfoObject := "PlayJsonExtraBuildInfo",
-  (console / initialCommands) += {
-    Seq(
-      "play.api.libs.json._", "play.jsonext._"
-    ).map("import " + _ + ";").mkString
-  },
-  checkGenerate := {
-    val _ = (generator / generateSources).value
-    val diff = sys.process.Process("git diff").lineStream_!
-    assert(diff.size == 0, diff)
-  },
-  playJsonVersion := {
-    crossProjectPlatform.value match {
-      case NativePlatform =>
-        "3.1.0-M1"
-      case _ =>
-        "3.0.4"
+lazy val playJsonExtra = CrossProject(UpdateReadme.moduleName, file("."))(JVMPlatform, JSPlatform, NativePlatform)
+  .crossType(
+    CrossType.Pure
+  )
+  .settings(
+    commonSettings,
+    name := UpdateReadme.moduleName,
+    buildInfoKeys := Seq[BuildInfoKey](
+      organization,
+      name,
+      version,
+      scalaVersion,
+      sbtVersion,
+      licenses,
+      playJsonVersion
+    ),
+    buildInfoPackage := "play.jsonext",
+    buildInfoObject := "PlayJsonExtraBuildInfo",
+    (console / initialCommands) += {
+      Seq(
+        "play.api.libs.json._",
+        "play.jsonext._"
+      ).map("import " + _ + ";").mkString
+    },
+    checkGenerate := {
+      val _ = (generator / generateSources).value
+      val diff = sys.process.Process("git diff").lineStream_!
+      assert(diff.size == 0, diff)
+    },
+    playJsonVersion := {
+      crossProjectPlatform.value match {
+        case NativePlatform =>
+          "3.1.0-M1"
+        case _ =>
+          "3.0.4"
+      }
+    },
+    libraryDependencies += "org.playframework" %%% "play-json" % playJsonVersion.value % "provided",
+    libraryDependencies += "org.scalacheck" %%% "scalacheck" % "1.19.0" % "test",
+    libraryDependencies += "com.github.xuwei-k" %%% "applybuilder" % "0.3.2" % "test",
+    libraryDependencies += "com.github.xuwei-k" %%% "unapply" % "0.1.0" % "test",
+    watchSources ++= ((generator / sourceDirectory).value ** "*.scala").get
+  )
+  .enablePlugins(BuildInfoPlugin)
+  .jsSettings(
+    scalacOptions += {
+      val a = (LocalRootProject / baseDirectory).value.toURI.toString
+      val g = "https://raw.githubusercontent.com/xuwei-k/play-json-extra/" + tagOrHash.value
+      val key = scalaBinaryVersion.value match {
+        case "3" =>
+          "-scalajs-mapSourceURI"
+        case _ =>
+          "-P:scalajs:mapSourceURI"
+      }
+      s"${key}:$a->$g/"
     }
-  },
-  libraryDependencies += "org.playframework" %%% "play-json" % playJsonVersion.value % "provided",
-  libraryDependencies += "org.scalacheck" %%% "scalacheck" % "1.19.0" % "test",
-  libraryDependencies += "com.github.xuwei-k" %%% "applybuilder" % "0.3.2" % "test",
-  libraryDependencies += "com.github.xuwei-k" %%% "unapply" % "0.1.0" % "test",
-  watchSources ++= ((generator / sourceDirectory).value ** "*.scala").get
-).enablePlugins(BuildInfoPlugin).jsSettings(
-  scalacOptions += {
-    val a = (LocalRootProject / baseDirectory).value.toURI.toString
-    val g = "https://raw.githubusercontent.com/xuwei-k/play-json-extra/" + tagOrHash.value
-    val key = scalaBinaryVersion.value match {
-      case "3" =>
-        "-scalajs-mapSourceURI"
-      case _ =>
-        "-P:scalajs:mapSourceURI"
-    }
-    s"${key}:$a->$g/"
-  }
-)
+  )
 
 commonSettings
 noPublish

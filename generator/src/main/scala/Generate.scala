@@ -1,14 +1,14 @@
 package play.jsonext
 
 import java.io.File
-import java.nio.file.Files
 import java.nio.charset.Charset
+import java.nio.file.Files
 import java.util.Collections.singletonList
 
 object Generate {
 
   private def deleteDir(file: File): Unit = {
-    if(!file.delete() && file.isDirectory){
+    if (!file.delete() && file.isDirectory) {
       Option(file.listFiles).toList.flatten.foreach(deleteDir)
       file.delete
     }
@@ -23,8 +23,11 @@ object Generate {
   private def generate(dir: File): Unit = {
     dir.mkdir
     List(
-      "Writes" -> writes, "Reads" -> reads, "Formats" -> formats, "CoproductFormats" -> coproduct
-    ).foreach{ case (name, contents) =>
+      "Writes" -> writes,
+      "Reads" -> reads,
+      "Formats" -> formats,
+      "CoproductFormats" -> coproduct
+    ).foreach { case (name, contents) =>
       val className = "CaseClass" + name
       val f = new File(dir, className + ".scala").toPath
       Files.write(f, singletonList(contents(className)), Charset.forName("UTF-8"))
@@ -32,7 +35,7 @@ object Generate {
   }
 
   private val packageLine = "package play.jsonext\n"
-  private val arities = (2 to 22)
+  private val arities = 2 to 22
   private def tparams(n: Int) = (1 to n).map("A" + _)
   private def params(n: Int) = (1 to n).map("key" + _)
 
@@ -43,10 +46,9 @@ object Generate {
     val WritesBuilder = s"WritesBuilder[B1]"
 
     val method: Int => String = { n =>
-
       val t = tparams(n).mkString(", ")
 
-s"""  implicit class ReadsAndWrites$n[$t](a: FunctionalBuilder[OFormat]#CanBuild$n[$t]) {
+      s"""  implicit class ReadsAndWrites$n[$t](a: FunctionalBuilder[OFormat]#CanBuild$n[$t]) {
     sealed abstract class $WritesBuilder{
       def apply[B2](f2: B2 => Option[($t)])(implicit B2: ClassTag[B2]): $ReadsAndWrites[B1, B2]
     }
@@ -60,9 +62,11 @@ s"""  implicit class ReadsAndWrites$n[$t](a: FunctionalBuilder[OFormat]#CanBuild
       }
   }
 
-  def format[Z, ${tparams(n).map(_ + " <: Z").mkString(", ")}](${(1 to n).map(i => s"a$i: $ReadsAndWrites[Z, A$i]").mkString(", ")}): OFormat[Z] = {
+  def format[Z, ${tparams(n).map(_ + " <: Z").mkString(", ")}](${(1 to n)
+          .map(i => s"a$i: $ReadsAndWrites[Z, A$i]")
+          .mkString(", ")}): OFormat[Z] = {
     OFormat(
-      ${(1 to n).map(i => s"a$i.reads").reduceLeft{ (x, y) => s"$ReadsAlternative.|($x, $y)" }},
+      ${(1 to n).map(i => s"a$i.reads").reduceLeft { (x, y) => s"$ReadsAlternative.|($x, $y)" }},
       OWrites[Z]{
         ${(1 to n).map(i => s"case a$i.C(a) => a$i.writes.writes(a)").mkString("; ")}
       }
@@ -85,7 +89,7 @@ s"""  implicit class ReadsAndWrites$n[$t](a: FunctionalBuilder[OFormat]#CanBuild
       }
   }"""
 
-packageLine + s"""
+    packageLine + s"""
 import play.api.libs.functional.{Alternative, FunctionalBuilder}
 import play.api.libs.json.{OFormat, OWrites, Reads}
 import scala.reflect.ClassTag
@@ -104,26 +108,32 @@ ${(2 to 21) map method mkString "\n"}
 
   private val writes: String => String = { className =>
     val method: Int => String = { n =>
-
       val apply = "apply"
       val applyN = "apply" + n
       val f = "f"
 
-      def methodDef(name: String) = s"""def $name[${tparams(n).mkString(", ")}, Z]($f: Z => Option[(${tparams(n).mkString(", ")})])(${params(n).map(_ + ": String").mkString(", ")})(implicit ${tparams(n).map(t => s"${t}: Writes[${t}]").mkString(", ")}): OWrites[Z] ="""
+      def methodDef(name: String) = s"""def $name[${tparams(n).mkString(", ")}, Z]($f: Z => Option[(${tparams(n)
+          .mkString(", ")})])(${params(n).map(_ + ": String").mkString(", ")})(implicit ${tparams(n)
+          .map(t => s"${t}: Writes[${t}]")
+          .mkString(", ")}): OWrites[Z] ="""
 
-s"""
+      s"""
   ${methodDef(applyN)}
     OWrites{ (z: Z) =>
       val tuple = $f(z).get
-      ${tparams(n).zip(params(n)).zipWithIndex.map{
-        case ((t, k), i) => s"(($k, $t.writes(tuple._${i + 1})))"
-      }.reverse.mkString("JsObject(Nil.::", ".::", ")")}
+      ${tparams(n)
+          .zip(params(n))
+          .zipWithIndex
+          .map { case ((t, k), i) =>
+            s"(($k, $t.writes(tuple._${i + 1})))"
+          }
+          .reverse
+          .mkString("JsObject(Nil.::", ".::", ")")}
     }
 
   ${methodDef(apply)}
     $applyN[${tparams(n).mkString(", ")}, Z]($f)(${params(n).mkString(", ")})(${tparams(n).mkString(", ")})
 """
-
 
     }
 
@@ -155,13 +165,22 @@ object $className {
       val fromPathsN = fromPaths + n
       val f = "f"
 
-      def pathMethodDef(name: String) = s"""def $name[${tparams(n).mkString(", ")}, Z]($f: (${tparams(n).mkString(", ")}) => Z)(${params(n).map(_ + ": JsPath").mkString(", ")})(implicit ${tparams(n).map(t => s"${t}: Reads[${t}]").mkString(", ")}): Reads[Z] ="""
+      def pathMethodDef(name: String) = s"""def $name[${tparams(n).mkString(", ")}, Z]($f: (${tparams(n).mkString(
+          ", "
+        )}) => Z)(${params(n).map(_ + ": JsPath").mkString(", ")})(implicit ${tparams(n)
+          .map(t => s"${t}: Reads[${t}]")
+          .mkString(", ")}): Reads[Z] ="""
 
-      def methodDef(name: String) = s"""def $name[${tparams(n).mkString(", ")}, Z]($f: (${tparams(n).mkString(", ")}) => Z)(${params(n).map(_ + ": String").mkString(", ")})(implicit ${tparams(n).map(t => s"${t}: Reads[${t}]").mkString(", ")}): Reads[Z] ="""
+      def methodDef(name: String) = s"""def $name[${tparams(n).mkString(", ")}, Z]($f: (${tparams(n).mkString(
+          ", "
+        )}) => Z)(${params(n).map(_ + ": String").mkString(", ")})(implicit ${tparams(n)
+          .map(t => s"${t}: Reads[${t}]")
+          .mkString(", ")}): Reads[Z] ="""
 
-s"""
+      s"""
   ${pathMethodDef(fromPathsN)}
-    ${zippedPath.tail.foldLeft(zippedPath.head){(result, a) => "G(" + result + ", " + a + ")"}}.map{ case ${values.mkString(" ~ ")} => f(${values.mkString(", ")})}
+    ${zippedPath.tail.foldLeft(zippedPath.head) { (result, a) => "G(" + result + ", " + a + ")" }}.map{ case ${values
+          .mkString(" ~ ")} => f(${values.mkString(", ")})}
 
   ${pathMethodDef(fromPaths)}
     $fromPathsN[${tparams(n).mkString(", ")}, Z]($f)(${params(n).mkString(", ")})(${tparams(n).mkString(", ")})
@@ -207,7 +226,7 @@ object $className {
       val W = "W"
 
       val ps: String = {
-        if(n == 1) tparams(n).mkString(", ")
+        if (n == 1) tparams(n).mkString(", ")
         else tparams(n).mkString("(", ", ", ")")
       }
 
@@ -227,11 +246,13 @@ object $className {
 
       val builder = s"""
   final class $builderN[R]($keys) {
-    def build[${tparams(n).mkString(", ")}, W]($applyFunc: $ps => R, $unapplyFunc: W => Option[$ps])(implicit $reads, $writes): (Reads[R], OWrites[W]) =
+    def build[${tparams(n).mkString(
+          ", "
+        )}, W]($applyFunc: $ps => R, $unapplyFunc: W => Option[$ps])(implicit $reads, $writes): (Reads[R], OWrites[W]) =
       (CaseClassReads($applyFunc)($paramValues), CaseClassWrites($unapplyFunc)($paramValues))
   }"""
 
-s"""
+      s"""
   ${methodDef(applyN)}
     OFormat(
       CaseClassReads($applyFunc)(${params(n).mkString(", ")}),
@@ -239,7 +260,8 @@ s"""
     )
 
   ${methodDef(apply)}
-    $applyN[${tparams(n).mkString(", ")}, Z]($applyFunc, $unapplyFunc)(${params(n).mkString(", ")})(${tparams(n).map(_ + R).mkString(", ")}, ${tparams(n).map(_ + W).mkString(", ")})
+    $applyN[${tparams(n).mkString(", ")}, Z]($applyFunc, $unapplyFunc)(${params(n)
+          .mkString(", ")})(${tparams(n).map(_ + R).mkString(", ")}, ${tparams(n).map(_ + W).mkString(", ")})
 
 $builder
 ${readsAndWritesMethod(readsAndWrites)}
@@ -257,5 +279,3 @@ object $className {
   }
 
 }
-
-

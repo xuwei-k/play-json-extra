@@ -1,8 +1,9 @@
 package play.jsonext
 
-import org.scalacheck._
-import play.api.libs.json.{OWrites, OFormat}
 import _root_.unapply.syntax._
+import org.scalacheck._
+import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
 
 object JsonExtraTest extends Properties("JsonExtra") {
 
@@ -11,7 +12,9 @@ object JsonExtraTest extends Properties("JsonExtra") {
   object Foo {
     implicit val fooOFormat: OFormat[Foo] =
       CaseClassFormats(apply _, (_: Foo).asTupleOption)(
-        "a", "b", "c"
+        "a",
+        "b",
+        "c"
       )
 
     implicit val fooArbitrary: Arbitrary[Foo] = Arbitrary(
@@ -34,17 +37,17 @@ object JsonExtraTest extends Properties("JsonExtra") {
     )
   }
 
-  property("write read") = Prop.forAll{ (foo: Foo) =>
+  property("write read") = Prop.forAll { (foo: Foo) =>
     val json = implicitly[OWrites[Foo]].writes(foo)
     json.as[Foo] == foo
   }
 
-  property("arity 1") = Prop.forAll{ (a: Arity1) =>
+  property("arity 1") = Prop.forAll { (a: Arity1) =>
     val json = implicitly[OWrites[Arity1]].writes(a)
     json.as[Arity1] == a
   }
 
-  property("22") = Prop.forAll{ (a: TwentyTwo) =>
+  property("22") = Prop.forAll { (a: TwentyTwo) =>
     val json = implicitly[OWrites[TwentyTwo]].writes(a)
     json.as[TwentyTwo] == a
   }
