@@ -180,7 +180,7 @@ lazy val playJsonExtra = projectMatrix
   .jvmPlatform(
     scalaVersions,
     Def.settings(
-      libraryDependencies += "org.playframework" %%% "play-json" % "3.0.4",
+      libraryDependencies += "org.playframework" %%% "play-json" % "3.0.6",
     )
   )
   .nativePlatform(
@@ -192,7 +192,7 @@ lazy val playJsonExtra = projectMatrix
   .jsPlatform(
     scalaVersions,
     Def.settings(
-      libraryDependencies += "org.playframework" %%% "play-json" % "3.0.4",
+      libraryDependencies += "org.playframework" %%% "play-json" % "3.0.6",
       scalacOptions += {
         val a = (LocalRootProject / baseDirectory).value.toURI.toString
         val g = "https://raw.githubusercontent.com/xuwei-k/play-json-extra/" + tagOrHash.value
