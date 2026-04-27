@@ -1,12 +1,8 @@
-import sbtcrossproject.CrossProject
-import sbtcrossproject.CrossType
 import sbtrelease.ReleaseStateTransformations._
 
-val playJsonVersion = settingKey[String]("")
 val generateSources = taskKey[Unit]("generate main source files")
 val generatedSourceDir = "generated"
 val checkGenerate = taskKey[Unit]("check generate")
-val playJsonExtraJVMRef = LocalProject(UpdateReadme.moduleName + "JVM")
 
 Global / onChangedBuildSource := ReloadOnSourceChanges
 
@@ -25,12 +21,16 @@ val unusedWarnings = Seq(
   "-Ywarn-unused",
 )
 
-val Scala212 = "2.12.21"
+def Scala3 = "3.3.7"
+
+val scalaVersions = Seq(
+  "2.12.21",
+  "2.13.18",
+  Scala3,
+)
 
 val commonSettings = Seq(
   publishTo := (if (isSnapshot.value) None else localStaging.value),
-  scalaVersion := Scala212,
-  crossScalaVersions := Scala212 :: "2.13.18" :: "3.3.7" :: Nil,
   scalacOptions ++= Seq(
     "-deprecation",
     "-unchecked",
@@ -51,7 +51,6 @@ val commonSettings = Seq(
   releaseTagName := tagName.value,
   releaseProcess := Seq[ReleaseStep](
     checkSnapshotDependencies,
-    releaseStepTask(playJsonExtraJVMRef / checkGenerate),
     inquireVersions,
     runClean,
     runTest,
@@ -59,14 +58,8 @@ val commonSettings = Seq(
     commitReleaseVersion,
     UpdateReadme.updateReadmeProcess,
     tagRelease,
-    ReleaseStep(
-      action = { state =>
-        val extracted = Project.extract(state)
-        extracted.runAggregated(extracted.get(thisProjectRef) / (Global / PgpKeys.publishSigned), state)
-      },
-      enableCrossBuild = true
-    ),
-    releaseStepCommand("sonaRelease"),
+    releaseStepCommandAndRemaining("publishSigned"),
+    releaseStepCommandAndRemaining("sonaRelease"),
     setNextVersion,
     commitNextVersion,
     UpdateReadme.updateReadmeProcess,
@@ -90,7 +83,7 @@ val commonSettings = Seq(
     val tag = tagOrHash.value
     Seq(
       "-sourcepath",
-      (playJsonExtraJVMRef / baseDirectory).value.getAbsolutePath,
+      (LocalRootProject / baseDirectory).value.getAbsolutePath,
       "-doc-source-url",
       s"https://github.com/xuwei-k/play-json-extra/tree/${tag}€{FILE_PATH}.scala"
     )
@@ -127,6 +120,7 @@ lazy val generator = Project(
 ).settings(
   commonSettings,
   noPublish,
+  scalaVersion := Scala3,
   generateSources := {
     val dir = ((LocalRootProject / baseDirectory).value / "src/main/scala" / generatedSourceDir).toString
     val cp = (Compile / fullClasspath).value
@@ -134,10 +128,10 @@ lazy val generator = Project(
   }
 )
 
-lazy val playJsonExtra = CrossProject(UpdateReadme.moduleName, file("."))(JVMPlatform, JSPlatform, NativePlatform)
-  .crossType(
-    CrossType.Pure
-  )
+lazy val playJsonExtra = projectMatrix
+  .withId(UpdateReadme.moduleName)
+  .in(file("."))
+  .defaultAxes()
   .settings(
     commonSettings,
     name := UpdateReadme.moduleName,
@@ -148,7 +142,6 @@ lazy val playJsonExtra = CrossProject(UpdateReadme.moduleName, file("."))(JVMPla
       scalaVersion,
       sbtVersion,
       licenses,
-      playJsonVersion
     ),
     buildInfoPackage := "play.jsonext",
     buildInfoObject := "PlayJsonExtraBuildInfo",
@@ -163,36 +156,44 @@ lazy val playJsonExtra = CrossProject(UpdateReadme.moduleName, file("."))(JVMPla
       val diff = sys.process.Process("git diff").lineStream_!
       assert(diff.size == 0, diff)
     },
-    playJsonVersion := {
-      crossProjectPlatform.value match {
-        case NativePlatform =>
-          "3.1.0-M1"
-        case _ =>
-          "3.0.4"
-      }
-    },
-    libraryDependencies += "org.playframework" %%% "play-json" % playJsonVersion.value % "provided",
     libraryDependencies += "org.scalacheck" %%% "scalacheck" % "1.19.0" % "test",
     libraryDependencies += "com.github.xuwei-k" %%% "applybuilder" % "0.3.2" % "test",
     libraryDependencies += "com.github.xuwei-k" %%% "unapply" % "0.1.0" % "test",
     watchSources ++= ((generator / sourceDirectory).value ** "*.scala").get
   )
   .enablePlugins(BuildInfoPlugin)
-  .jsSettings(
-    scalacOptions += {
-      val a = (LocalRootProject / baseDirectory).value.toURI.toString
-      val g = "https://raw.githubusercontent.com/xuwei-k/play-json-extra/" + tagOrHash.value
-      val key = scalaBinaryVersion.value match {
-        case "3" =>
-          "-scalajs-mapSourceURI"
-        case _ =>
-          "-P:scalajs:mapSourceURI"
-      }
-      s"${key}:$a->$g/"
-    }
+  .jvmPlatform(
+    scalaVersions,
+    Def.settings(
+      libraryDependencies += "org.playframework" %%% "play-json" % "3.0.4",
+    )
+  )
+  .nativePlatform(
+    scalaVersions,
+    Def.settings(
+      libraryDependencies += "org.playframework" %%% "play-json" % "3.1.0-M1",
+    )
+  )
+  .jsPlatform(
+    scalaVersions,
+    Def.settings(
+      libraryDependencies += "org.playframework" %%% "play-json" % "3.0.4",
+      scalacOptions += {
+        val a = (LocalRootProject / baseDirectory).value.toURI.toString
+        val g = "https://raw.githubusercontent.com/xuwei-k/play-json-extra/" + tagOrHash.value
+        val key = scalaBinaryVersion.value match {
+          case "3" =>
+            "-scalajs-mapSourceURI"
+          case _ =>
+            "-P:scalajs:mapSourceURI"
+        }
+        s"${key}:$a->$g/"
+      },
+    )
   )
 
 commonSettings
 noPublish
 Compile / scalaSource := baseDirectory.value / "dummy"
 Test / scalaSource := baseDirectory.value / "dummy"
+autoScalaLibrary := false
