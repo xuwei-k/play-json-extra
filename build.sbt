@@ -1,7 +1,9 @@
 import sbtrelease.ReleaseStateTransformations._
 
+@transient
 val generateSources = taskKey[Unit]("generate main source files")
 val generatedSourceDir = "generated"
+@transient
 val checkGenerate = taskKey[Unit]("check generate")
 
 Global / onChangedBuildSource := ReloadOnSourceChanges
