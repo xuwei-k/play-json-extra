@@ -156,8 +156,8 @@ object $className {
   private val reads: String => String = { className =>
     val method: Int => String = { n =>
       val values = (1 to n).map("a" + _)
-      val zippedString = (tparams(n), params(n)).zipped.map((t, k) => s"JsPath \\ $k").toList
-      val zippedPath = (tparams(n), params(n)).zipped.map((t, k) => s"Reads.at[$t]($k)($t)").toList
+      val zippedString = tparams(n).lazyZip(params(n)).map((t, k) => s"JsPath \\ $k").toList
+      val zippedPath = tparams(n).lazyZip(params(n)).map((t, k) => s"Reads.at[$t]($k)($t)").toList
 
       val apply = "apply"
       val applyN = "apply" + n
