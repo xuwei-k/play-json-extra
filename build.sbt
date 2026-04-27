@@ -19,8 +19,17 @@ val tagOrHash = Def.setting {
   }
 }
 
-val unusedWarnings = Seq(
-  "-Ywarn-unused",
+val unusedWarnings = Def.setting(
+  scalaBinaryVersion.value match {
+    case "2.12" =>
+      Seq(
+        "-Ywarn-unused",
+      )
+    case _ =>
+      Seq(
+        "-Wunused:imports",
+      )
+  }
 )
 
 def Scala3 = "3.3.7"
@@ -36,15 +45,17 @@ val commonSettings = Seq(
   scalacOptions ++= Seq(
     "-deprecation",
     "-unchecked",
-    "-Xlint",
     "-language:existentials",
-    "-language:higherKinds",
     "-language:implicitConversions",
-  ) ++ unusedWarnings,
+  ) ++ unusedWarnings.value,
   scalacOptions ++= {
     CrossVersion.partialVersion(scalaVersion.value) match {
-      case Some((2, 11 | 12)) =>
-        Seq("-Xfuture")
+      case Some((2, 12)) =>
+        Seq(
+          "-Xfuture",
+          "-language:higherKinds",
+          "-Xlint",
+        )
       case _ =>
         Nil
     }
@@ -105,7 +116,9 @@ val commonSettings = Seq(
       <tag>{tagOrHash.value}</tag>
     </scm>
   )
-) ++ Seq(Compile, Test).flatMap(c => c / console / scalacOptions ~= { _.filterNot(unusedWarnings.toSet) })
+) ++ Seq(Compile, Test).flatMap(c =>
+  c / console / scalacOptions := { (c / console / scalacOptions).value.filterNot(unusedWarnings.value.toSet) }
+)
 
 val noPublish = Seq(
   PgpKeys.publishLocalSigned := {},
