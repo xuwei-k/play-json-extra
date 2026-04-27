@@ -159,7 +159,7 @@ lazy val playJsonExtra = projectMatrix
     libraryDependencies += "org.scalacheck" %%% "scalacheck" % "1.19.0" % "test",
     libraryDependencies += "com.github.xuwei-k" %%% "applybuilder" % "0.3.2" % "test",
     libraryDependencies += "com.github.xuwei-k" %%% "unapply" % "0.1.0" % "test",
-    watchSources ++= ((generator / sourceDirectory).value ** "*.scala").get
+    watchSources ++= ((generator / sourceDirectory).value ** "*.scala").get()
   )
   .enablePlugins(BuildInfoPlugin)
   .jvmPlatform(
