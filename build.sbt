@@ -32,7 +32,7 @@ val unusedWarnings = Def.setting(
   }
 )
 
-def Scala3 = "3.3.8"
+def Scala3 = "3.8.4"
 
 val scalaVersions = Seq(
   "2.12.21",
