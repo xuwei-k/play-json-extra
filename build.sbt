@@ -79,8 +79,8 @@ val commonSettings = Seq(
     pushChanges
   ),
   organization := "com.github.xuwei-k",
-  licenses := Seq("MIT License" -> url("https://opensource.org/licenses/mit-license")),
-  homepage := Some(url("https://github.com/xuwei-k/play-json-extra")),
+  licenses := Seq("MIT License" -> uri("https://opensource.org/licenses/mit-license")),
+  homepage := Some(uri("https://github.com/xuwei-k/play-json-extra")),
   commands += Command.command("updateReadme")(UpdateReadme.updateReadme),
   pomPostProcess := { node =>
     import scala.xml._
