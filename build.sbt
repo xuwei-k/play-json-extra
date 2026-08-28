@@ -171,7 +171,7 @@ lazy val playJsonExtra = projectMatrix
       val diff = sys.process.Process("git diff").lazyLines_!
       assert(diff.size == 0, diff)
     },
-    libraryDependencies += "org.scalacheck" %% "scalacheck" % "1.19.0" % "test",
+    libraryDependencies += "org.scalacheck" %% "scalacheck" % "1.20.0" % "test",
     libraryDependencies += "com.github.xuwei-k" %% "applybuilder" % "0.4.0" % "test",
     libraryDependencies += "com.github.xuwei-k" %% "unapply" % "0.2.0" % "test",
     watchSources ++= Def.uncached(((generator / sourceDirectory).value ** "*.scala").get())
