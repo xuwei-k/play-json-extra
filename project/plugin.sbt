@@ -5,7 +5,7 @@ scalacOptions ++= Seq(
   "-language:implicitConversions",
 )
 
-addSbtPlugin("org.scala-native" % "sbt-scala-native" % "0.5.12")
+addSbtPlugin("org.scala-native" % "sbt-scala-native" % "0.5.13")
 
 addSbtPlugin("com.github.sbt" % "sbt-pgp" % "2.4.0")
 
